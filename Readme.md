@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ольга Жидкова](https://up.htmlacademy.ru/ecmascript/9/user/849827).
-* Наставник: `Неизвестно`.
+* Наставник: [Kate Savasteeva](https://htmlacademy.ru/profile/id1155389).
 
 ---
 
