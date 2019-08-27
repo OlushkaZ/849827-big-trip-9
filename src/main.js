@@ -1,6 +1,5 @@
-const EVENTS_COUNT = 3;
-// let tripPoints = [];
-// tripPoints.add(3);
+const EVENTS_COUNT = 4;
+const tripPoints = [];
 import {createSiteMenuTemplate} from './components/site-menu.js';
 import {createSiteFilterTemplate} from './components/site-filter.js';
 import {createRouteTemplate} from './components/current-route.js';
@@ -16,36 +15,38 @@ const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
 const getRoute = ()=>{
-  const arr = [];
-  arr[0] = tripPoints ? tripPoints[0].destination : ``;
-  arr[1] = tripPoints.length > 3 ? `...` : tripPoints[1].destination;
-  arr[2] = tripPoints.length > 2 ? tripPoints[tripPoints.length - 1].destination : tripPoints[0].destination;
-  return arr;
+  const cities = tripPoints.map(({destination}) => destination);
+  const routePoints = new Array(3);
+  routePoints[0] = cities.shift();
+  routePoints[2] = cities.length === 0 ? routePoints[0] : cities.pop();
+  routePoints[1] = cities.length === 1 ? cities.pop() : `...`;
+  return routePoints;
 };
-const siteControlsElement = document.querySelector(`.trip-main__trip-controls`);
+const tripMainElement = document.querySelector(`.trip-main`);
+const siteControlsElement = tripMainElement.querySelector(`.trip-main__trip-controls`);
 render(siteControlsElement.firstElementChild, createSiteMenuTemplate(menu), `afterend`);
 render(siteControlsElement, createSiteFilterTemplate(filter), `beforeend`);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 render(tripEventsElement, createEventListTemplate(), `beforeend`);
 const eventsListElement = tripEventsElement.querySelector(`.trip-events__list`);
-render(eventsListElement, createEventEditTemplate(getTripPoint()), `afterbegin`);
-const getTripPoints = (count)=>new Array(count)
+const newTripPoint = getTripPoint();
+tripPoints.push(newTripPoint);
+render(eventsListElement, createEventEditTemplate(newTripPoint), `afterbegin`);
+tripPoints.push(...(new Array(EVENTS_COUNT - 1)
   .fill(``)
-  .map(getTripPoint);
-const tripPoints = getTripPoints(EVENTS_COUNT);
+  .map(getTripPoint)));
 
 const renderEvents = (container) => {
   container.insertAdjacentHTML(`beforeend`,
-      // new Array(count)
-      // .fill(``)
-      // .map(getTripPoint)
-      // .map((item)=>tripPoints.push(item))
-      tripPoints.map(createEventTemplate)
+      tripPoints.slice(1).map(createEventTemplate)
     .join(``));
 };
 
 renderEvents(eventsListElement);
-const siteRouteElement = document.querySelector(`.trip-main__trip-info`);
+const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
 render(siteRouteElement, createRouteTemplate(getRoute()), `afterbegin`);
-// new Array(3).fill(``).forEach(() => render(eventsListElement, createEventTemplate(), `beforeend`));
+
+const tripCost = tripMainElement.querySelector(`.trip-info__cost-value`);
+const getTotalCost = () => tripPoints.reduce((sum, {price})=> sum + price, 0);
+tripCost.textContent = getTotalCost();

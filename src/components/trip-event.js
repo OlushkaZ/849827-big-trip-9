@@ -23,11 +23,11 @@ export const createEventTemplate = ({tripPointType, destination, startDate, fini
 
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${offers.map((offer, ind)=>offer.check && ind < 2 ? `<li class="event__offer">
+    ${offers.map((offer)=>offer.check ? `<li class="event__offer">
           <span class="event__offer-title">${offer.name}</span>
           &plus;
           &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-         </li>` : ``).join(``)}
+         </li>` : ``).slice(0, 2).join(``)}
 
     </ul>
 
