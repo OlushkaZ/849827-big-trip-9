@@ -1,4 +1,5 @@
-
+const getDate = (date)=> new Date(date);
+const getDateString = (date)=> date.toDateString();
 export const createEventTemplate = ({tripPointType, destination, startDate, finishDate, price, offers}) => {
   return `
  <li class="trip-events__item">
@@ -10,11 +11,11 @@ export const createEventTemplate = ({tripPointType, destination, startDate, fini
 
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${new Date(startDate)}">${new Date(startDate).toDateString()}</time>
+        <time class="event__start-time" datetime="${getDate(startDate)}">${getDateString(getDate(startDate))}</time>
         &mdash;
-        <time class="event__end-time" datetime="${new Date(finishDate)}">${new Date(finishDate).toDateString()}</time>
+        <time class="event__end-time" datetime="${getDate(finishDate)}">${getDateString(getDate(finishDate))}</time>
       </p>
-      <p class="event__duration">${new Date(finishDate) - new Date(startDate)}</p>
+      <p class="event__duration">${getDate(finishDate) - getDate(startDate)}</p>
     </div>
 
     <p class="event__price">

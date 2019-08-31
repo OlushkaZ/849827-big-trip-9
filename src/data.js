@@ -1,10 +1,11 @@
-
+const randomNumber = (number)=> Math.floor(Math.random() * number);
+const randomDate = (lowerLimit, dayCount)=> Date.now() + lowerLimit * 24 * 60 * 60 * 1000 + randomNumber(dayCount) * 24 * 60 * 60 * 1000;
 const descriptionFrom = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`.split(`.`);
 const getDescription = (descript)=>{
   let description = ``;
-  let i = Math.floor(Math.random() * 3) + 1;
+  let i = randomNumber(3) + 1;
   for (i; i--;) {
-    description = description + descript[Math.floor(Math.random() * 11)] + `.`;
+    description = description + descript[randomNumber(11)] + `.`;
   }
   return description;
 };
@@ -29,32 +30,16 @@ export const destinations = [
 ];
 
 export const getTripPoint = () => ({
-  tripPointType: [
-    {name: `bus`, move: true},
-    {name: `drive`, move: true},
-    {name: `ship`, move: true},
-    {name: `taxi`, move: true},
-    {name: `train`, move: true},
-    {name: `transport`, move: true},
-    {name: `check-in`, move: false},
-    {name: `restaurant`, move: false},
-    {name: `sightseeing`, move: false}
-  ][Math.floor(Math.random() * 9)],
-  destination: [
-    `Moscow`,
-    `Paris`,
-    `Sochi`,
-    `Istanbul`,
-    `Praga`,
-  ][Math.floor(Math.random() * 5)],
-  startDate: Date.now() - 3 * 24 * 60 * 60 * 1000 + Math.floor(Math.random() * 4) * 24 * 60 * 60 * 1000,
-  finishDate: Date.now() + 4 * 24 * 60 * 60 * 1000 + Math.floor(Math.random() * 5) * 24 * 60 * 60 * 1000,
-  price: Math.floor(Math.random() * 1000),
+  tripPointType: tripPointTypes[randomNumber(9)],
+  destination: destinations[randomNumber(5)],
+  startDate: randomDate(-3, 4),
+  finishDate: randomDate(4, 5),
+  price: randomNumber(1000),
   offers: [
-    {name: `Add luggage`, price: Math.floor(Math.random() * 1000), check: Boolean(Math.round(Math.random()))},
-    {name: `Switch to comfort class`, price: Math.floor(Math.random() * 1000), check: Boolean(Math.round(Math.random()))},
-    {name: `Add meal`, price: Math.floor(Math.random() * 1000), check: Boolean(Math.round(Math.random()))},
-    {name: `Choose seats`, price: Math.floor(Math.random() * 1000), check: Boolean(Math.round(Math.random()))}
+    {name: `Add luggage`, price: randomNumber(1000), check: Boolean(Math.round(Math.random()))},
+    {name: `Switch to comfort class`, price: randomNumber(1000), check: Boolean(Math.round(Math.random()))},
+    {name: `Add meal`, price: randomNumber(1000), check: Boolean(Math.round(Math.random()))},
+    {name: `Choose seats`, price: randomNumber(1000), check: Boolean(Math.round(Math.random()))}
   ],
   description: getDescription(descriptionFrom)
 });

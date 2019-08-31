@@ -7,9 +7,9 @@ import {createEventTemplate} from './components/trip-event.js';
 import {createEventEditTemplate} from './components/trip-event-edit.js';
 import {createEventListTemplate} from './components/trip-event-list.js';
 
-import {getTripPoint} from './data.js';
-import {filter} from './data.js';
-import {menu} from './data.js';
+import {getTripPoint, filter, menu} from './data.js';
+// import {filter} from './data.js';
+// import {menu} from './data.js';
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
