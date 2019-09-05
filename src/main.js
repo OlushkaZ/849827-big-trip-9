@@ -6,6 +6,7 @@ import {RouteTemplate} from './components/current-route.js';
 import {EventTemplate} from './components/trip-event.js';
 import {EventEditTemplate} from './components/trip-event-edit.js';
 import {EventListTemplate} from './components/trip-event-list.js';
+import {NoPointsTemplate} from './components/no-points.js';
 
 import {getTripPoint, filter, menu} from './data.js';
 import {render, Position} from './utils.js';
@@ -32,17 +33,26 @@ const renderSiteFilterTemplate = () => {
 };
 renderSiteFilterTemplate();
 
+const pointMocks = new Array(EVENTS_COUNT)
+.fill(``)
+.map(getTripPoint);
+tripPoints.push(...pointMocks);
+
 const tripEventsElement = document.querySelector(`.trip-events`);
 const renderEventListTemplate = () => {
   const eventListTemplate = new EventListTemplate();
   render(tripEventsElement, eventListTemplate.getElement(), Position.BEFOREEND);
 };
-renderEventListTemplate();
+const renderNoPointsTemplate = () => {
+  const noPointsTemplate = new NoPointsTemplate();
+  render(tripEventsElement, noPointsTemplate.getElement(), Position.BEFOREEND);
+};
+if (tripPoints.length === 0) {
+  renderNoPointsTemplate();
+} else {
+  renderEventListTemplate();
+}
 
-const pointMocks = new Array(EVENTS_COUNT)
-  .fill(``)
-  .map(getTripPoint);
-tripPoints.push(...pointMocks);
 
 const eventsListContainer = tripEventsElement.querySelector(`.trip-events__list`);
 const renderTripPoint = (pointMock) => {
