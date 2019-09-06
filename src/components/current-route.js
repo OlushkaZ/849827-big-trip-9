@@ -2,7 +2,6 @@ import {AbstractComponent} from './abstract-component.js';
 export class RouteTemplate extends AbstractComponent {
   constructor([one, two, three]) {
     super();
-    this._element = null;
     this._pointOne = one;
     this._pointTwo = two;
     this._pointThree = three;

@@ -8,7 +8,6 @@ export class EventTemplate extends AbstractComponent {
     this._destination = destination;
     this._price = price;
     this._offers = offers;
-    this._element = null;
   }
 
   static getDateString(date) {

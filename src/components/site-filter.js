@@ -2,7 +2,6 @@ import {AbstractComponent} from './abstract-component.js';
 export class SiteFilterTemplate extends AbstractComponent {
   constructor(filter) {
     super();
-    this._element = null;
     this._filter = filter;
   }
 

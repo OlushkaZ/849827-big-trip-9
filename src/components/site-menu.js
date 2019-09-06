@@ -2,7 +2,6 @@ import {AbstractComponent} from './abstract-component.js';
 export class SiteMenuTemplate extends AbstractComponent {
   constructor(menu) {
     super();
-    this._element = null;
     this._menu = menu;
   }
 

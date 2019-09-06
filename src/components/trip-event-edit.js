@@ -13,7 +13,6 @@ export class EventEditTemplate extends AbstractComponent {
     this._price = price;
     this._offers = offers;
     this._description = description;
-    this._element = null;
   }
 
   static getDateString(date) {

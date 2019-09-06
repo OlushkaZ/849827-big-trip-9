@@ -1,9 +1,5 @@
 import {AbstractComponent} from './abstract-component.js';
 export class EventListTemplate extends AbstractComponent {
-  constructor() {
-    super();
-    this._element = null;
-  }
 
   getTemplate() {
     return `<ul class="trip-days">
