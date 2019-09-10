@@ -1,21 +1,10 @@
-import {createElement} from '../utils.js';
-export class RouteTemplate {
+import {AbstractComponent} from './abstract-component.js';
+export class RouteTemplate extends AbstractComponent {
   constructor([one, two, three]) {
-    this._element = null;
+    super();
     this._pointOne = one;
     this._pointTwo = two;
     this._pointThree = three;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

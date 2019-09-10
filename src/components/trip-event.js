@@ -1,24 +1,13 @@
-import {createElement} from '../utils.js';
-export class EventTemplate {
+import {AbstractComponent} from './abstract-component.js';
+export class EventTemplate extends AbstractComponent {
   constructor({tripPointType, destination, startDate, finishDate, price, offers}) {
+    super();
     this._tripPointType = tripPointType;
     this._startDate = new Date(startDate);
     this._finishDate = new Date(finishDate);
     this._destination = destination;
     this._price = price;
     this._offers = offers;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   static getDateString(date) {

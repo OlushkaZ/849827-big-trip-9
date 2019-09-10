@@ -3,10 +3,7 @@ const tripPoints = [];
 import {SiteMenuTemplate} from './components/site-menu.js';
 import {SiteFilterTemplate} from './components/site-filter.js';
 import {RouteTemplate} from './components/current-route.js';
-import {EventTemplate} from './components/trip-event.js';
-import {EventEditTemplate} from './components/trip-event-edit.js';
-import {EventListTemplate} from './components/trip-event-list.js';
-import {NoPointsTemplate} from './components/no-points.js';
+import {TripController} from './controllers/trip.js';
 
 import {getTripPoint, filter, menu} from './data.js';
 import {render, Position} from './utils.js';
@@ -39,54 +36,8 @@ const pointMocks = new Array(EVENTS_COUNT)
 tripPoints.push(...pointMocks);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-const renderEventListTemplate = () => {
-  const eventListTemplate = new EventListTemplate();
-  render(tripEventsElement, eventListTemplate.getElement(), Position.BEFOREEND);
-};
-const renderNoPointsTemplate = () => {
-  const noPointsTemplate = new NoPointsTemplate();
-  render(tripEventsElement, noPointsTemplate.getElement(), Position.BEFOREEND);
-};
-if (tripPoints.length === 0) {
-  renderNoPointsTemplate();
-} else {
-  renderEventListTemplate();
-}
-
-
-const eventsListContainer = tripEventsElement.querySelector(`.trip-events__list`);
-const renderTripPoint = (pointMock) => {
-  const tripEvent = new EventTemplate(pointMock);
-  const tripEventEdit = new EventEditTemplate(pointMock);
-
-  const onEscKeyDown = (evt) => {
-    if (evt.key === `Escape` || evt.key === `Esc`) {
-      eventsListContainer.replaceChild(tripEvent.getElement(), tripEventEdit.getElement());
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-
-  tripEvent.getElement()
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, () => {
-      eventsListContainer.replaceChild(tripEventEdit.getElement(), tripEvent.getElement());
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-  tripEventEdit.getElement()
-  .querySelector(`.event--edit`)
-  .addEventListener(`submit`, ()=>{
-    eventsListContainer.replaceChild(tripEvent.getElement(), tripEventEdit.getElement());
-    document.removeEventListener(`keydown`, onEscKeyDown);
-  });
-
-  render(eventsListContainer, tripEvent.getElement(), Position.BEFOREEND);
-};
-
-if (eventsListContainer) {
-  pointMocks.forEach((pointMock) => renderTripPoint(pointMock));
-}
-
+const tripController = new TripController(tripEventsElement, pointMocks);
+tripController.init();
 
 const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
 const renderRouteTemplate = () => {

@@ -1,19 +1,8 @@
-import {createElement} from '../utils.js';
-export class SiteFilterTemplate {
+import {AbstractComponent} from './abstract-component.js';
+export class SiteFilterTemplate extends AbstractComponent {
   constructor(filter) {
-    this._element = null;
+    super();
     this._filter = filter;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

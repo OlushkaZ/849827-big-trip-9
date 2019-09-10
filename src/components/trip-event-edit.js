@@ -1,9 +1,9 @@
-import {tripPointTypes} from '../data.js';
-import {destinations} from '../data.js';
+import {tripPointTypes, destinations} from '../data.js';
 
-import {createElement} from '../utils.js';
-export class EventEditTemplate {
+import {AbstractComponent} from './abstract-component.js';
+export class EventEditTemplate extends AbstractComponent {
   constructor({tripPointType, destination, startDate, finishDate, price, offers, description}) {
+    super();
     this._tripPointType = tripPointType;
     this._tripPointTypes = tripPointTypes;
     this._startDate = new Date(startDate);
@@ -13,18 +13,6 @@ export class EventEditTemplate {
     this._price = price;
     this._offers = offers;
     this._description = description;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   static getDateString(date) {
