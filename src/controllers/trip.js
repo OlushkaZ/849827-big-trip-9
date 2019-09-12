@@ -91,11 +91,17 @@ export class TripController {
         document.getElementById(evt.target.htmlFor).checked = true;
         break;
       case `sort-time`:
-        const sortedByTime = this._tripPoints.slice().sort((a, b) => a.startDate - b.startDate);
-        sortedByTime.forEach((tripPoint) => this._renderTripPoint(tripPoint, this._eventList.getElement()));
+      // TripDayTemplate.count = null;
+        render(this._eventList.getElement(), new TripDayTemplate(0, this._tripPoints.length).getElement(), Position.BEFOREEND);
+        const containersByTime = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
+        const sortedByTime = this._tripPoints.slice().map(function (point) {
+          point.duration = point.finishDate - point.startDate;
+          return point;
+        }).sort((a, b) => b.duration - a.duration);
+        sortedByTime.forEach((tripPoint, ind) => this._renderTripPoint(tripPoint, containersByTime[ind]));
         break;
       case `sort-price`:
-        TripDayTemplate.count = null;
+        // TripDayTemplate.count = null;
         render(this._eventList.getElement(), new TripDayTemplate(0, this._tripPoints.length).getElement(), Position.BEFOREEND);
         const containersByPrice = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByPrice = this._tripPoints.slice().sort((a, b) => b.price - a.price);
