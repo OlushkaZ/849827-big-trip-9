@@ -30,13 +30,56 @@ export class PointController {
        });
 
     this._tripEventEdit.getElement()
-     // .querySelector(`.event`)
      .addEventListener(`submit`, ()=>{
        this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
 
+    this._tripEventEdit.getElement()
+     .querySelector(`.event__save-btn`)
+     .addEventListener(`click`, (evt) => {
+       evt.preventDefault();
+
+       const formData = new FormData(this._tripEventEdit.getElement());
+
+       const entry = {
+         tripPointType: this._getEventType(),
+         destination: formData.get(`event-destination`),
+         startDate: formData.get(`event-start-time`),
+         finishDate: formData.get(`event-end-time`),
+         price: formData.get(`event-price`),
+         description: this._tripEventEdit.getElement().querySelector(`.event__destination-description`).textContent,
+         offers: this._getOffers()
+       };
+       this._onDataChange(entry, this._data);
+       document.removeEventListener(`keydown`, onEscKeyDown);
+     });
+
     render(this._container, this._tripEvent.getElement(), Position.BEFOREEND);
+  }
+
+  _getOffers() {
+    const offerChecks = this._tripEventEdit.getElement().querySelectorAll(`.event__offer-checkbox`);
+    const offerTitle = this._tripEventEdit.getElement().querySelectorAll(`.event__offer-title`);
+    const offerPrice = this._tripEventEdit.getElement().querySelectorAll(`.event__offer-price`);
+    const offers = [];
+    offerChecks.forEach(function (item, ind) {
+      const offer = {};
+      offer.name = offerTitle[ind].textContent;
+      offer.price = offerPrice[ind].textContent;
+      offer.check = item.checked;
+      offers.push(offer);
+    });
+    return offers;
+  }
+  _getEventType() {
+    const typeCheckbox = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
+    const inputs = this._tripEventEdit.getElement().querySelectorAll(`.event__type-input`);
+    const eventTypeInput = Array.from(inputs).filter((input)=>input.checked);
+    const eventType = {};
+    eventType.name = eventTypeInput[0].value;
+    eventType.move = typeCheckbox.checked;
+    return eventType;
   }
 
   setDefaultView() {

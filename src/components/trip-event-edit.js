@@ -23,6 +23,14 @@ export class EventEditTemplate extends AbstractComponent {
     return tripPointType.move ? ` to` : ` in`;
   }
 
+  static checkMove(tripPointType) {
+    return tripPointType.move ? ` checked` : ``;
+  }
+
+  // static currentType(name) {
+  //   return name === this._tripPointType.name ? `checked` : ``;
+  // }
+
   static getPhotos() {
     return new Array(Math.floor(Math.random() * 4) + 1).fill(``).map(()=>`
      <img class="event__photo" src="http://picsum.photos/300/150?r=${Math.random()}" alt="Event photo">
@@ -37,7 +45,7 @@ export class EventEditTemplate extends AbstractComponent {
                             <span class="visually-hidden">Choose event type</span>
                             <img class="event__type-icon" width="17" height="17" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">
                           </label>
-                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${EventEditTemplate.checkMove(this._tripPointType)}>
 
                           <div class="event__type-list">
                             <fieldset class="event__type-group">
@@ -45,7 +53,7 @@ export class EventEditTemplate extends AbstractComponent {
 
                               ${this._tripPointTypes.map((type) =>type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}">
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -56,7 +64,7 @@ export class EventEditTemplate extends AbstractComponent {
 
                               ${this._tripPointTypes.map((type) => !type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}">
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
