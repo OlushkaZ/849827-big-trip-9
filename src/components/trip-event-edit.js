@@ -1,4 +1,5 @@
 import {tripPointTypes, destinations} from '../data.js';
+import moment from 'moment';
 
 import {AbstractComponent} from './abstract-component.js';
 export class EventEditTemplate extends AbstractComponent {
@@ -16,7 +17,7 @@ export class EventEditTemplate extends AbstractComponent {
   }
 
   static getDateString(date) {
-    return date.toDateString();
+    return moment(date).format(`DD/MM/YY HH:mm`);
   }
 
   static isMove(tripPointType) {
@@ -26,10 +27,6 @@ export class EventEditTemplate extends AbstractComponent {
   static checkMove(tripPointType) {
     return tripPointType.move ? ` checked` : ``;
   }
-
-  // static currentType(name) {
-  //   return name === this._tripPointType.name ? `checked` : ``;
-  // }
 
   static getPhotos() {
     return new Array(Math.floor(Math.random() * 4) + 1).fill(``).map(()=>`

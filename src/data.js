@@ -1,5 +1,5 @@
 const randomNumber = (number)=> Math.floor(Math.random() * number);
-const randomDate = (lowerLimit, dayCount)=> Date.now() + lowerLimit * 24 * 60 * 60 * 1000 + randomNumber(dayCount) * 24 * 60 * 60 * 1000;
+const randomDate = (lowerLimit, dayCount)=> Date.now() + lowerLimit * 24 * 60 * 60 * 1000 + randomNumber(dayCount) * 24 * 60 * 60 * 1000 + randomNumber(dayCount) * 1000 * 60 * 60 + randomNumber(dayCount) * 1000 * 60 + randomNumber(dayCount) * 1000;
 const descriptionFrom = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`.split(`.`);
 const getDescription = (descript)=>{
   let description = ``;
@@ -32,8 +32,8 @@ export const destinations = [
 export const getTripPoint = () => ({
   tripPointType: tripPointTypes[randomNumber(9)],
   destination: destinations[randomNumber(5)],
-  startDate: randomDate(-3, 4),
-  finishDate: randomDate(4, 5),
+  startDate: randomDate(-1, 2),
+  finishDate: randomDate(1, 5),
   price: randomNumber(1000),
   offers: [
     {name: `Add luggage`, price: randomNumber(1000), check: Boolean(Math.round(Math.random()))},

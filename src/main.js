@@ -14,6 +14,8 @@ const getRoute = ()=>{
   routePoints[0] = cities.shift();
   routePoints[2] = cities.length === 0 ? routePoints[0] : cities.pop();
   routePoints[1] = cities.length === 1 ? cities.pop() : `...`;
+  routePoints[3] = tripPoints.length > 0 ? tripPoints[0].startDate : ``;
+  routePoints[4] = tripPoints.length > 0 ? tripPoints[tripPoints.length - 1].finishDate : ``;
   return routePoints;
 };
 const tripMainElement = document.querySelector(`.trip-main`);
