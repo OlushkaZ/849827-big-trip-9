@@ -29,6 +29,7 @@ export class TripController {
   }
 
   _renderDays() {
+    TripDayTemplate.count = null;
     const allDays = this._tripPoints.map(({startDate}) => (new Date(startDate)).setHours(0, 0, 0, 0)).slice().sort((a, b)=>a - b);
     const unicumDays = allDays.filter((item, pos)=>allDays.indexOf(item) === pos);
     const container = this._eventList.getElement();
@@ -77,7 +78,7 @@ export class TripController {
 
     switch (evt.target.htmlFor) {
       case `sort-event`:
-        TripDayTemplate.count = null;
+        // TripDayTemplate.count = null;
         const sortedByStartTime = this._tripPoints.slice().sort((a, b) => a.startDate - b.startDate);
         this._renderEvents(sortedByStartTime);
         document.getElementById(evt.target.htmlFor).checked = true;

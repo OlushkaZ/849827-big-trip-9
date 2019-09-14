@@ -1,6 +1,7 @@
 import {EventTemplate} from '../components/trip-event.js';
 import {EventEditTemplate} from '../components/trip-event-edit.js';
 import {render, Position, Key} from '../utils.js';
+import moment from 'moment';
 export class PointController {
   constructor(container, data, onDataChange, onChangeView) {
     this._container = container;
@@ -45,8 +46,8 @@ export class PointController {
        const entry = {
          tripPointType: this._getEventType(),
          destination: formData.get(`event-destination`),
-         startDate: formData.get(`event-start-time`),
-         finishDate: formData.get(`event-end-time`),
+         startDate: moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).toDate().getTime(),
+         finishDate: moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`).toDate().getTime(),
          price: formData.get(`event-price`),
          description: this._tripEventEdit.getElement().querySelector(`.event__destination-description`).textContent,
          offers: this._getOffers()
@@ -76,6 +77,7 @@ export class PointController {
     const typeCheckbox = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
     const inputs = this._tripEventEdit.getElement().querySelectorAll(`.event__type-input`);
     const eventTypeInput = Array.from(inputs).filter((input)=>input.checked);
+    // const type = eventTypeInput[0].parentNode.parentNode.textContent
     const eventType = {};
     eventType.name = eventTypeInput[0].value;
     eventType.move = typeCheckbox.checked;
