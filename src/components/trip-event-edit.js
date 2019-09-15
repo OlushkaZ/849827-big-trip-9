@@ -1,4 +1,5 @@
 import {tripPointTypes, destinations} from '../data.js';
+import moment from 'moment';
 
 import {AbstractComponent} from './abstract-component.js';
 export class EventEditTemplate extends AbstractComponent {
@@ -16,11 +17,15 @@ export class EventEditTemplate extends AbstractComponent {
   }
 
   static getDateString(date) {
-    return date.toDateString();
+    return moment(date).format(`DD/MM/YY HH:mm`);
   }
 
   static isMove(tripPointType) {
     return tripPointType.move ? ` to` : ` in`;
+  }
+
+  static checkMove(tripPointType) {
+    return tripPointType.move ? ` checked` : ``;
   }
 
   static getPhotos() {
@@ -30,15 +35,14 @@ export class EventEditTemplate extends AbstractComponent {
   }
 
   getTemplate() {
-    return `<li class="trip-events__item">
-                    <form class="event  event--edit" action="#" method="post">
+    return `<form class="event  event--edit" action="#" method="post">
                       <header class="event__header">
                         <div class="event__type-wrapper">
                           <label class="event__type  event__type-btn" for="event-type-toggle-1">
                             <span class="visually-hidden">Choose event type</span>
                             <img class="event__type-icon" width="17" height="17" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">
                           </label>
-                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${EventEditTemplate.checkMove(this._tripPointType)}>
 
                           <div class="event__type-list">
                             <fieldset class="event__type-group">
@@ -46,7 +50,7 @@ export class EventEditTemplate extends AbstractComponent {
 
                               ${this._tripPointTypes.map((type) =>type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}">
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -57,7 +61,7 @@ export class EventEditTemplate extends AbstractComponent {
 
                               ${this._tripPointTypes.map((type) => !type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}">
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -143,7 +147,6 @@ export class EventEditTemplate extends AbstractComponent {
                           </div>
                         </section>
                       </section>
-                    </form>
-                  </li>`;
+                    </form>`;
   }
 }
