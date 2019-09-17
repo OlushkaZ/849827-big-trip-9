@@ -73,12 +73,6 @@ export class PointController {
                 altFormat: `d/m/y H:i`,
               });
             });
-
-    //     flatpickr(this._tripEventEdit.getElement()
-    //.querySelector(`.event__input--time`), {
-    //   // plugins: [new confirmDatePlugin()],
-    //dataFormat: `d/m/y H:i`,
-    // });
     render(this._container, this._tripEvent.getElement(), Position.BEFOREEND);
   }
 

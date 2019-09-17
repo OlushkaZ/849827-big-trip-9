@@ -20,6 +20,9 @@ export const render = (container, element, place)=>{
     case Position.AFTERBEGIN:
       container.prepend(element);
       break;
+    case Position.AFTEREND:
+      container.after(element);
+      break;
     case Position.BEFOREEND:
       container.append(element);
       break;
