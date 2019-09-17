@@ -63,7 +63,14 @@ export class TripController {
   }
 
   _onDataChange(newData, oldData) {
-    this._tripPoints[this._tripPoints.findIndex((it) => it === oldData)] = newData;
+    const index = this._tripPoints.findIndex((point) => point === oldData);
+    if (newData === null) {
+      this._tripPoints = [...this._tripPoints.slice(0, index), ...this._tripPoints.slice(index + 1)];
+      // this._showedPoints = Math.min(this._showedPoints, this._tripPoints.length);
+    } else {
+      this._tripPoints[index] = newData;
+    }
+    // this._tripPoints[this._tripPoints.findIndex((it) => it === oldData)] = newData;
     this._renderEventList(this._tripPoints);
   }
 

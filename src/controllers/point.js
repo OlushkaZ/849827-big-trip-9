@@ -73,6 +73,12 @@ export class PointController {
                 altFormat: `d/m/y H:i`,
               });
             });
+
+    this._tripEventEdit.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, () => {
+        this._onDataChange(null, this._data);
+      });
+
     render(this._container, this._tripEvent.getElement(), Position.BEFOREEND);
   }
 
