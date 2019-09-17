@@ -51,8 +51,8 @@ export class PointController {
        const entry = {
          tripPointType: this._getEventType(),
          destination: formData.get(`event-destination`),
-         startDate: moment(formData.get(`event-start-time`), `DD/MM/YY HH:mm`).toDate().getTime(),
-         finishDate: moment(formData.get(`event-end-time`), `DD/MM/YY HH:mm`).toDate().getTime(),
+         startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
+         finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
          price: formData.get(`event-price`),
          description: this._tripEventEdit.getElement().querySelector(`.event__destination-description`).textContent,
          offers: this._getOffers()
@@ -60,19 +60,24 @@ export class PointController {
        this._onDataChange(entry, this._data);
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
-    flatpickr(this._tripEventEdit
-           .getElement()
-           .querySelector(`.event__input--time`), {
-             enableTime: true,
-               altInput: true,
-               allowInput: true,
-               defaultDate: this._data.startDate,
-                 altFormat: `d/m/y H:i`,
-                   dataFormat: `d/m/y H:i`,
-           });
+    this._tripEventEdit
+            .getElement()
+            .querySelectorAll(`.event__input--time`).forEach((timeInput)=>{
+              flatpickr(timeInput, {
+                enableTime: true,
+                altInput: true,
+                allowInput: true,
+                // defaultDate: timeInput.value.getTime(),
+                defaultDate: moment(timeInput.value, `DD-MM-YY HH:mm`).toDate().getTime(),
+                // defaultDate: this._data.startDate,
+                altFormat: `d/m/y H:i`,
+              });
+            });
+
     //     flatpickr(this._tripEventEdit.getElement()
     //.querySelector(`.event__input--time`), {
     //   // plugins: [new confirmDatePlugin()],
+    //dataFormat: `d/m/y H:i`,
     // });
     render(this._container, this._tripEvent.getElement(), Position.BEFOREEND);
   }
