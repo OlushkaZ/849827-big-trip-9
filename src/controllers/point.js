@@ -2,6 +2,11 @@ import {EventTemplate} from '../components/trip-event.js';
 import {EventEditTemplate} from '../components/trip-event-edit.js';
 import {render, Position, Key} from '../utils.js';
 import moment from 'moment';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.css';
+import 'flatpickr/dist/themes/light.css';
+// const flatpickr = require(`flatpickr`);
+// import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
 export class PointController {
   constructor(container, data, onDataChange, onChangeView) {
     this._container = container;
@@ -55,7 +60,20 @@ export class PointController {
        this._onDataChange(entry, this._data);
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
-
+    flatpickr(this._tripEventEdit
+           .getElement()
+           .querySelector(`.event__input--time`), {
+             enableTime: true,
+               altInput: true,
+               allowInput: true,
+               defaultDate: this._data.startDate,
+                 altFormat: `d/m/y H:i`,
+                   dataFormat: `d/m/y H:i`,
+           });
+    //     flatpickr(this._tripEventEdit.getElement()
+    //.querySelector(`.event__input--time`), {
+    //   // plugins: [new confirmDatePlugin()],
+    // });
     render(this._container, this._tripEvent.getElement(), Position.BEFOREEND);
   }
 
