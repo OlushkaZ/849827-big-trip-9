@@ -1,5 +1,6 @@
 import {EventTemplate} from '../components/trip-event.js';
 import {EventEditTemplate} from '../components/trip-event-edit.js';
+import {EventNewTemplate} from '../components/trip-event-new.js';
 import {render, Position, Key} from '../utils.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
@@ -7,21 +8,46 @@ import 'flatpickr/dist/flatpickr.css';
 import 'flatpickr/dist/themes/light.css';
 // const flatpickr = require(`flatpickr`);
 // import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
+export const Mode = {
+  ADDING: `adding`,
+  DEFAULT: `default`
+};
 export class PointController {
-  constructor(container, data, onDataChange, onChangeView) {
+  constructor(container, data, mode, onDataChange, onChangeView) {
     this._container = container;
     this._data = data;
     this._onChangeView = onChangeView;
     this._onDataChange = onDataChange;
     this._tripEvent = new EventTemplate(data);
     this._tripEventEdit = new EventEditTemplate(data);
+    this._tripEventNew = new EventNewTemplate(data);
 
-    this.init();
+    this.init(mode);
   }
-  init() {
+
+  init(mode) {
+    let renderPosition = Position.BEFOREEND;
+    let currentView = this._tripEvent;
+
+    if (mode === Mode.ADDING) {
+      renderPosition = Position.BEFOREBEGIN;
+      currentView = this._tripEventNew;
+    }
+
     const onEscKeyDown = (evt) => {
       if (evt.key === Key.ESCAPE || evt.key === Key.ESCAPE_IE) {
-        this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
+
+        if (mode === Mode.DEFAULT) {
+          if (this._container.contains(this._tripEventEdit.getElement())) {
+            // this._container.getElement().replaceChild(this._taskView.getElement(), this._taskEdit.getElement());
+            this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
+          }
+        } else if (mode === Mode.ADDING) {
+          this._container.removeChild(currentView.getElement());
+          // Захотели создать карточку, но не стали ее сохранять
+          this._onDataChange(null, null);
+        }
+        // this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
@@ -36,7 +62,8 @@ export class PointController {
        });
 
     this._tripEventEdit.getElement()
-     .addEventListener(`submit`, ()=>{
+     .addEventListener(`submit`, (evt)=>{
+       evt.preventDefault();
        this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
@@ -57,9 +84,12 @@ export class PointController {
          description: this._tripEventEdit.getElement().querySelector(`.event__destination-description`).textContent,
          offers: this._getOffers()
        };
-       this._onDataChange(entry, this._data);
+
+       this._onDataChange(entry, mode === Mode.DEFAULT ? this._data : null);
+       // this._onDataChange(entry, this._data);
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
+
     this._tripEventEdit
             .getElement()
             .querySelectorAll(`.event__input--time`).forEach((timeInput)=>{
@@ -67,9 +97,7 @@ export class PointController {
                 enableTime: true,
                 altInput: true,
                 allowInput: true,
-                // defaultDate: timeInput.value.getTime(),
                 defaultDate: moment(timeInput.value, `DD-MM-YY HH:mm`).toDate().getTime(),
-                // defaultDate: this._data.startDate,
                 altFormat: `d/m/y H:i`,
               });
             });
@@ -79,7 +107,8 @@ export class PointController {
         this._onDataChange(null, this._data);
       });
 
-    render(this._container, this._tripEvent.getElement(), Position.BEFOREEND);
+    render(this._container, currentView.getElement(), renderPosition);
+  // render(this._container.getElement(), currentView.getElement(), renderPosition);
   }
 
   _getOffers() {

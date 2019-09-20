@@ -35,7 +35,7 @@ export class EventTemplate extends AbstractComponent {
   getTemplate() {
     return `<div class="event">
        <div class="event__type">
-         <img class="event__type-icon" width="42" height="42" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">
+         ${this._tripPointType ? `<img class="event__type-icon" width="42" height="42" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">` : ``}
        </div>
        <h3 class="event__title">${this._tripPointType.name} ${EventTemplate.isMove(this._tripPointType)} ${this._destination}</h3>
 

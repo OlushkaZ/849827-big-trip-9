@@ -1,7 +1,8 @@
 export const Position = {
   AFTERBEGIN: `afterbegin`,
   AFTEREND: `afterend`,
-  BEFOREEND: `beforeend`
+  BEFOREEND: `beforeend`,
+  BEFOREBEGIN: `beforebegin`
 };
 
 export const Key = {
@@ -22,6 +23,9 @@ export const render = (container, element, place)=>{
       break;
     case Position.AFTEREND:
       container.after(element);
+      break;
+    case Position.BEFOREBEGIN:
+      container.before(element);
       break;
     case Position.BEFOREEND:
       container.append(element);
