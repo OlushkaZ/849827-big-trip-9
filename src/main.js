@@ -4,6 +4,7 @@ import {SiteMenuTemplate} from './components/site-menu.js';
 import {SiteFilterTemplate} from './components/site-filter.js';
 import {RouteTemplate} from './components/current-route.js';
 import {TripController} from './controllers/trip.js';
+import {Statistics} from './components/statistics.js';
 
 import {getTripPoint, filter, menu} from './data.js';
 import {render, Position} from './utils.js';
@@ -18,19 +19,56 @@ const getRoute = ()=>{
   routePoints[4] = tripPoints.length > 0 ? tripPoints[tripPoints.length - 1].finishDate : ``;
   return routePoints;
 };
+const statistics = new Statistics();
+statistics.getElement().classList.add(`visually-hidden`);
 const tripMainElement = document.querySelector(`.trip-main`);
 const siteControlsElement = tripMainElement.querySelector(`.trip-main__trip-controls`);
 const renderSiteMenuTemplate = () => {
   const siteMenuTemplate = new SiteMenuTemplate(menu);
-  render(siteControlsElement.firstElementChild, siteMenuTemplate.getElement(), Position.ARTEREND);
+  siteMenuTemplate.getElement().addEventListener(`click`, (evt) => {
+    evt.preventDefault();
+
+    if (evt.target.tagName !== `A`) {
+      return;
+    }
+    // tripEventsElement.classList.toggle(`trip-events--hidden`);
+    // statistics.getElement().classList.toggle(`visually-hidden`);
+
+    switch (evt.target.textContent) {
+      case `table`:
+        tripEventsElement.classList.remove(`trip-events--hidden`);
+        siteFilterTemplate.getElement().classList.remove(`trip-filters--hidden`);
+        const stat = statistics.getElement();
+        if (!stat.classList.contains(`visually-hidden`)) {
+          stat.classList.add(`visually-hidden`);
+        }
+        break;
+      case `stats`:
+        if (!tripEventsElement.classList.contains(`trip-events--hidden`)) {
+          tripEventsElement.classList.add(`trip-events--hidden`);
+        }
+        const siteFilter = siteFilterTemplate.getElement();
+        if (!siteFilter.classList.contains(`trip-filters--hidden`)) {
+          siteFilter.classList.add(`trip-filters--hidden`);
+        }
+        statistics.getElement().classList.remove(`visually-hidden`);
+        break;
+    }
+  });
+  render(siteControlsElement.firstElementChild, siteMenuTemplate.getElement(), Position.AFTEREND);
 };
 renderSiteMenuTemplate();
 
+const siteFilterTemplate = new SiteFilterTemplate(filter);
 const renderSiteFilterTemplate = () => {
-  const siteFilterTemplate = new SiteFilterTemplate(filter);
   render(siteControlsElement, siteFilterTemplate.getElement(), Position.BEFOREEND);
 };
 renderSiteFilterTemplate();
+const newEventButton = tripMainElement.querySelector(`.trip-main__event-add-btn`);
+newEventButton.addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  tripController.createTripPoint();
+});
 
 const pointMocks = new Array(EVENTS_COUNT)
 .fill(``)
@@ -40,6 +78,7 @@ tripPoints.push(...pointMocks);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const tripController = new TripController(tripEventsElement, pointMocks);
 tripController.init();
+render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
 
 const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
 const renderRouteTemplate = () => {
