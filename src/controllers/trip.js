@@ -4,7 +4,20 @@ import {NoPointsTemplate} from '../components/no-points.js';
 import {SortingList} from '../components/sorting-list.js';
 import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
+// import {api} from '../main.js';
 const PointControllerMode = Mode;
+// const tripPointTypes = [
+//   {name: `bus`, move: true},
+//   {name: `flight`, move: true},
+//   {name: `drive`, move: true},
+//   {name: `ship`, move: true},
+//   {name: `taxi`, move: true},
+//   {name: `train`, move: true},
+//   {name: `transport`, move: true},
+//   {name: `check-in`, move: false},
+//   {name: `restaurant`, move: false},
+//   {name: `sightseeing`, move: false}
+// ];
 
 export class TripController {
   constructor(container, tripPoints) {
@@ -17,6 +30,8 @@ export class TripController {
     this._creatingTripPoint = null;
     this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
+    // this._api = api;
+    this.init();
   }
   init() {
     if (this._tripPoints.length === 0) {
@@ -49,7 +64,7 @@ export class TripController {
     this._creatingTripPoint = true;
     // this._onDataChange(defaultPoint, null);
     const container = this._container.querySelector(`.trip-days`);
-    this._creatingTripPoint = new PointController(container, defaultPoint, PointControllerMode.ADDING, this._onChangeView, this._onDataChange);
+    this._creatingTripPoint = new PointController(container, defaultPoint, PointControllerMode.ADDING, this._onDataChange, this._onChangeView);
   }
 
   _renderDays() {

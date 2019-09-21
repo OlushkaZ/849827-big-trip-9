@@ -5,9 +5,24 @@ import {SiteFilterTemplate} from './components/site-filter.js';
 import {RouteTemplate} from './components/current-route.js';
 import {TripController} from './controllers/trip.js';
 import {Statistics} from './components/statistics.js';
+import {API} from './api.js';
 
 import {getTripPoint, filter, menu} from './data.js';
 import {render, Position} from './utils.js';
+
+const AUTHORIZATION = `Basic eo0w590ik29889aaa=${Math.random()}`;
+const END_POINT = `https://htmlacademy-es-9.appspot.com/big-trip`;
+
+export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
+const zzz = api.getPoints().then((points) => console.log(points));
+const rrr = api.getDestinations().then((destinations) => console.log(destinations));
+// const uuu = api.getDestinations();
+// console.log(uuu);
+// const onDataChange = () => {};
+
+// const boardController = new BoardController(taskListElement, onDataChange);
+
+// api.getTasks().then((tasks) => boardController.show(tasks));
 
 const getRoute = ()=>{
   const cities = tripPoints.map(({destination}) => destination);
@@ -67,17 +82,18 @@ renderSiteFilterTemplate();
 const newEventButton = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
-  tripController.createTripPoint();
+  // tripController.createTripPoint();
 });
 
-const pointMocks = new Array(EVENTS_COUNT)
-.fill(``)
-.map(getTripPoint);
-tripPoints.push(...pointMocks);
+// const pointMocks = new Array(EVENTS_COUNT)
+// .fill(``)
+// .map(getTripPoint);
+// tripPoints.push(...pointMocks);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-const tripController = new TripController(tripEventsElement, pointMocks);
-tripController.init();
+api.getPoints().then((points) => new TripController(tripEventsElement, points));
+// const tripController = new TripController(tripEventsElement, pointMocks);
+// tripController.init();
 render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
 
 const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);

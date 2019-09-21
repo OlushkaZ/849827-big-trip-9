@@ -2,9 +2,10 @@ import {AbstractComponent} from './abstract-component.js';
 import moment from 'moment';
 
 export class EventTemplate extends AbstractComponent {
-  constructor({tripPointType, destination, startDate, finishDate, price, offers}) {
+  constructor({type, destination, startDate, finishDate, price, offers}, tripPointTypes) {
     super();
-    this._tripPointType = tripPointType;
+    this._type = type;
+    this._types = tripPointTypes;
     this._startDate = new Date(startDate);
     this._finishDate = new Date(finishDate);
     this._destination = destination;
@@ -16,9 +17,11 @@ export class EventTemplate extends AbstractComponent {
     return moment(date).format(` HH:mm`);
   }
 
-  static isMove(tripPointType) {
-    return tripPointType.move ? ` to` : ` in`;
+  _isMove(currentType) {
+    const pointType = this._types.filter((type)=>type.name === currentType)[0];
+    return pointType.move ? ` to` : ` in`;
   }
+
   static getDurationTime(startDate, finishDate) {
     const duration = finishDate - startDate;
     const durationInMinutes = Math.floor((duration) / 1000 / 60);
@@ -35,9 +38,9 @@ export class EventTemplate extends AbstractComponent {
   getTemplate() {
     return `<div class="event">
        <div class="event__type">
-         ${this._tripPointType ? `<img class="event__type-icon" width="42" height="42" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">` : ``}
+         ${this._type ? `<img class="event__type-icon" width="42" height="42" src="img/icons/${this._type}.png" alt="Event type icon">` : ``}
        </div>
-       <h3 class="event__title">${this._tripPointType.name} ${EventTemplate.isMove(this._tripPointType)} ${this._destination}</h3>
+       <h3 class="event__title">${this._type} ${this._isMove(this._type)} ${this._destination.name}</h3>
 
        <div class="event__schedule">
          <p class="event__time">
@@ -54,8 +57,8 @@ export class EventTemplate extends AbstractComponent {
 
        <h4 class="visually-hidden">Offers:</h4>
        <ul class="event__selected-offers">
-       ${this._offers.map((offer)=>offer.check ? `<li class="event__offer">
-             <span class="event__offer-title">${offer.name}</span>
+       ${this._offers.map((offer)=>offer.accepted ? `<li class="event__offer">
+             <span class="event__offer-title">${offer.title}</span>
              &plus;
              &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
             </li>` : ``).slice(0, 2).join(``)}

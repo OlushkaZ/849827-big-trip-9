@@ -2,6 +2,7 @@ import {EventTemplate} from '../components/trip-event.js';
 import {EventEditTemplate} from '../components/trip-event-edit.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
 import {render, Position, Key} from '../utils.js';
+import {api} from '../main.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
@@ -12,15 +13,30 @@ export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`
 };
+const tripPointTypes = [
+  {name: `bus`, move: true},
+  {name: `flight`, move: true},
+  {name: `drive`, move: true},
+  {name: `ship`, move: true},
+  {name: `taxi`, move: true},
+  {name: `train`, move: true},
+  {name: `transport`, move: true},
+  {name: `check-in`, move: false},
+  {name: `restaurant`, move: false},
+  {name: `sightseeing`, move: false}
+];
+
 export class PointController {
   constructor(container, data, mode, onDataChange, onChangeView) {
     this._container = container;
     this._data = data;
     this._onChangeView = onChangeView;
     this._onDataChange = onDataChange;
-    this._tripEvent = new EventTemplate(data);
-    this._tripEventEdit = new EventEditTemplate(data);
-    this._tripEventNew = new EventNewTemplate(data);
+    this._tripEvent = new EventTemplate(data, tripPointTypes);
+    this._tripEventEdit = new EventEditTemplate(data, tripPointTypes);
+    this._tripEventNew = new EventNewTemplate(data, tripPointTypes);
+    this._api = api;
+    // this._arr = [];
 
     this.init(mode);
   }
@@ -33,6 +49,30 @@ export class PointController {
       renderPosition = Position.BEFOREBEGIN;
       currentView = this._tripEventNew;
     }
+    const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
+    while (destinationList.firstElementChild) {
+      destinationList.removeChild(destinationList.firstElementChild);
+    }
+
+    this._api.getDestinations().then((destinations) => destinations
+       .map(({name}) => render(destinationList, `<option value="` + name + `">`, Position.BEFOREEND)));
+    const destinationDescriptionContainer = this._tripEventEdit.getElement()
+       .querySelector(`.event__destination-description`);
+    const fillDesinationDescription = (dest)=>{
+      destinationDescriptionContainer.textContent = dest;
+    };
+    const onDestinationChange = (evt) =>{
+      // Array.from(destinationList.children).map();
+      const newDestination = evt.target.value;
+      this._api.getDestinations().then((destinations) => destinations
+          .filter(({name})=> name === newDestination))
+          .then(([dest])=>fillDesinationDescription(dest.description));
+      // .then(([dest])=>render(destinationList, dest.description, Position.BEFOREEND));
+    };
+    this._tripEventEdit.getElement()
+              .querySelector(`.event__input--destination`)
+              .addEventListener(`change`, onDestinationChange);
+
 
     const onEscKeyDown = (evt) => {
       if (evt.key === Key.ESCAPE || evt.key === Key.ESCAPE_IE) {
