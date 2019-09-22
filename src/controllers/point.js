@@ -49,16 +49,34 @@ export class PointController {
       renderPosition = Position.BEFOREBEGIN;
       currentView = this._tripEventNew;
     }
+
+    const onTypeChoose = (evt)=>{
+      if (evt.target.tagName === `INPUT`) {
+        const pointType = tripPointTypes.filter((type)=>type.name === evt.target.value)[0];
+
+        this._tripEventEdit.getElement()
+                  .querySelector(`.event__label`).textContent = evt.target.value + (pointType.move ? ` to` : ` in`);
+        this._tripEventEdit.getElement()
+                  .querySelector(`.event__type-icon`).src = `img/icons/${evt.target.value}.png`;
+        evt.target.checked = true;
+        typeToggle.checked = false;
+        typeList.removeEventListener(`click`, onTypeChoose);
+      }
+    };
+    const typeList = this._tripEventEdit.getElement().querySelector(`.event__type-list`);
+    const typeToggle = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
+    typeToggle.addEventListener(`change`, ()=>
+      typeList.addEventListener(`click`, onTypeChoose)
+    );
     const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
     while (destinationList.firstElementChild) {
       destinationList.removeChild(destinationList.firstElementChild);
     }
-
     this._api.getDestinations().then((destinations) => destinations
        .map(({name}) => render(destinationList, `<option value="` + name + `">`, Position.BEFOREEND)));
-    const destinationDescriptionContainer = this._tripEventEdit.getElement()
-       .querySelector(`.event__destination-description`);
     const fillDesinationDescription = (dest)=>{
+      const destinationDescriptionContainer = this._tripEventEdit.getElement()
+      .querySelector(`.event__destination-description`);
       destinationDescriptionContainer.textContent = dest;
     };
     const onDestinationChange = (evt) =>{
