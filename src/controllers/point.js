@@ -154,8 +154,9 @@ export class PointController {
          type: formData.get(`event-type`),
          destination: currentDestination,
          id: this._data.id,
-         startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
-         finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
+         isFavorite: formData.get(`event-favorite`) ? true : false,
+         startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate(),
+         finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate(),
          price: formData.get(`event-price`),
          offers: this._getOffers()
        };
@@ -193,9 +194,9 @@ export class PointController {
     const offers = [];
     offerChecks.forEach(function (item, ind) {
       const offer = {};
-      offer.name = offerTitle[ind].textContent;
+      offer.title = offerTitle[ind].textContent;
       offer.price = offerPrice[ind].textContent;
-      offer.check = item.checked;
+      offer.accepted = item.checked;
       offers.push(offer);
     });
     return offers;
