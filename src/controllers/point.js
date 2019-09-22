@@ -1,7 +1,7 @@
 import {EventTemplate} from '../components/trip-event.js';
 import {EventEditTemplate} from '../components/trip-event-edit.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
-import {render, Position, Key} from '../utils.js';
+import {render, createElement, Position, Key} from '../utils.js';
 import {api} from '../main.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
@@ -49,7 +49,7 @@ export class PointController {
       renderPosition = Position.BEFOREBEGIN;
       currentView = this._tripEventNew;
     }
-
+    let currentDestination = this._data.destination;
     const onTypeChoose = (evt)=>{
       if (evt.target.tagName === `INPUT`) {
         const pointType = tripPointTypes.filter((type)=>type.name === evt.target.value)[0];
@@ -74,17 +74,34 @@ export class PointController {
     }
     this._api.getDestinations().then((destinations) => destinations
        .map(({name}) => render(destinationList, `<option value="` + name + `">`, Position.BEFOREEND)));
-    const fillDesinationDescription = (dest)=>{
-      const destinationDescriptionContainer = this._tripEventEdit.getElement()
-      .querySelector(`.event__destination-description`);
-      destinationDescriptionContainer.textContent = dest;
+    const destinationDescriptionContainer = this._tripEventEdit.getElement()
+       .querySelector(`.event__destination-description`);
+    const fillDesinationDescription = (desc)=>{
+      destinationDescriptionContainer.textContent = desc;
+    };
+    const destinationPhotoContainer = this._tripEventEdit.getElement()
+       .querySelector(`.event__photos-tape`);
+
+    const getPhotoTemplate = (pict)=>`<img class="event__photo" src="${pict.src}" alt="${pict.description}">`;
+
+    const fillDesinationPhotos = (pictures)=>{
+      while (destinationPhotoContainer.firstElementChild) {
+        destinationPhotoContainer.removeChild(destinationPhotoContainer.firstElementChild);
+      }
+      pictures.map((pict)=>render(destinationPhotoContainer, createElement(getPhotoTemplate(pict)), Position.BEFOREEND));
+      // render(destinationPhotoContainer, createElement(getPhotos(pictures)), Position.BEFOREEND);
     };
     const onDestinationChange = (evt) =>{
       // Array.from(destinationList.children).map();
       const newDestination = evt.target.value;
       this._api.getDestinations().then((destinations) => destinations
           .filter(({name})=> name === newDestination))
-          .then(([dest])=>fillDesinationDescription(dest.description));
+          .then(([dest])=>{
+            currentDestination = dest;
+            fillDesinationDescription(dest.description);
+            fillDesinationPhotos(dest.pictures);
+          });
+      // .then(([dest])=>fillDesinationPhotos(dest.pictures));
       // .then(([dest])=>render(destinationList, dest.description, Position.BEFOREEND));
     };
     this._tripEventEdit.getElement()
@@ -134,12 +151,12 @@ export class PointController {
        const formData = new FormData(this._tripEventEdit.getElement());
 
        const entry = {
-         tripPointType: this._getEventType(),
-         destination: formData.get(`event-destination`),
+         type: formData.get(`event-type`),
+         destination: currentDestination,
+         id: this._data.id,
          startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
          finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
          price: formData.get(`event-price`),
-         description: this._tripEventEdit.getElement().querySelector(`.event__destination-description`).textContent,
          offers: this._getOffers()
        };
 
