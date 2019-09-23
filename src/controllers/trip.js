@@ -4,20 +4,8 @@ import {NoPointsTemplate} from '../components/no-points.js';
 import {SortingList} from '../components/sorting-list.js';
 import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
-// import {api} from '../main.js';
+import {api} from '../main.js';
 const PointControllerMode = Mode;
-// const tripPointTypes = [
-//   {name: `bus`, move: true},
-//   {name: `flight`, move: true},
-//   {name: `drive`, move: true},
-//   {name: `ship`, move: true},
-//   {name: `taxi`, move: true},
-//   {name: `train`, move: true},
-//   {name: `transport`, move: true},
-//   {name: `check-in`, move: false},
-//   {name: `restaurant`, move: false},
-//   {name: `sightseeing`, move: false}
-// ];
 
 export class TripController {
   constructor(container, tripPoints) {
@@ -100,26 +88,52 @@ export class TripController {
   _onChangeView() {
     this._subscriptions.forEach((it) => it());
   }
-
-  _onDataChange(newData, oldData) {
-    const index = this._tripPoints.findIndex((point) => point === oldData);
-
-    if (newData === null && oldData === null) {
-      this._creatingTripPoint = null;
+  _onDataChange(actionType, update) {
+    switch (actionType) {
+      case `update`:
+        api.updatePoint({
+          id: update.id,
+          data: update.toRAW()
+        })
+        .then((tasks) => {
+          this._eventList.getElement().innerHTML = ``;
+          //обновить точку в массиве ???
+          // this._tripPoints = tasks;
+          this._renderEventList(this._tripPoints);
+        });
+        break;
+      case `delete`:
+        api.deletePoint({
+          id: update.id
+        })
+          .then(() => api.getPoints())
+          .then((tasks) => {
+            this._eventList.getElement().innerHTML = ``;
+            this._tripPoints = tasks;
+            this._renderEventList(this._tripPoints);
+          });
+        break;
     }
-
-    if (newData === null) {
-      this._tripPoints = [...this._tripPoints.slice(0, index), ...this._tripPoints.slice(index + 1)];
-      // this._showedPoints = Math.min(this._showedPoints, this._tripPoints.length);
-    } else if (oldData === null) {
-      this._creatingTripPoint = null;
-      this._tripPoints = [newData, ...this._tripPoints];
-    } else {
-      this._tripPoints[index] = newData;
-    }
-
-    this._renderEventList(this._tripPoints);
   }
+  // _onDataChange(newData, oldData) {
+  //   const index = this._tripPoints.findIndex((point) => point === oldData);
+  //
+  //   if (newData === null && oldData === null) {
+  //     this._creatingTripPoint = null;
+  //   }
+  //
+  //   if (newData === null) {
+  //     this._tripPoints = [...this._tripPoints.slice(0, index), ...this._tripPoints.slice(index + 1)];
+  //     // this._showedPoints = Math.min(this._showedPoints, this._tripPoints.length);
+  //   } else if (oldData === null) {
+  //     this._creatingTripPoint = null;
+  //     this._tripPoints = [newData, ...this._tripPoints];
+  //   } else {
+  //     this._tripPoints[index] = newData;
+  //   }
+  //
+  //   this._renderEventList(this._tripPoints);
+  // }
 
   _onSortLinkClick(evt) {
     evt.preventDefault();

@@ -48,19 +48,19 @@ export const API = class {
   //     .then(toJSON);
   // }
 
-  // updateTask({id, data}) {
-  //   return this._load({
-  //     url: `tasks/${id}`,
-  //     method: Method.PUT,
-  //     body: JSON.stringify(data),
-  //     headers: new Headers({'Content-Type': `application/json`})
-  //   })
-  //     .then(toJSON);
-  // }
+  updatePoint({id, data}) {
+    return this._load({
+      url: `points/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON);
+  }
 
-  // deleteTask({id}) {
-  //   return this._load({url: `tasks/${id}`, method: Method.DELETE});
-  // }
+  deletePoint({id}) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
+  }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);

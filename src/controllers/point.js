@@ -150,18 +150,27 @@ export class PointController {
 
        const formData = new FormData(this._tripEventEdit.getElement());
 
-       const entry = {
-         type: formData.get(`event-type`),
-         destination: currentDestination,
-         id: this._data.id,
-         isFavorite: formData.get(`event-favorite`) ? true : false,
-         startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate(),
-         finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate(),
-         price: formData.get(`event-price`),
-         offers: this._getOffers()
-       };
+       this._data.type = formData.get(`event-type`);
+       this._data.destination = currentDestination;
+       this._data.isFavorite = formData.get(`event-favorite`) ? true : false;
+       this._data.startDate = moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate();
+       this._data.finishDate = moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate();
+       this._data.price = formData.get(`event-price`);
+       this._data.offers = this._getOffers();
 
-       this._onDataChange(entry, mode === Mode.DEFAULT ? this._data : null);
+       // const entry = {
+       //   type: formData.get(`event-type`),
+       //   destination: currentDestination,
+       //   id: this._data.id,
+       //   isFavorite: formData.get(`event-favorite`) ? true : false,
+       //   startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
+       //   finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
+       //   price: formData.get(`event-price`),
+       //   offers: this._getOffers()
+       // };
+
+       this._onDataChange(`update`, mode === Mode.DEFAULT ? this._data : null);
+       // this._onDataChange(entry, mode === Mode.DEFAULT ? this._data : null);
        // this._onDataChange(entry, this._data);
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
@@ -180,7 +189,8 @@ export class PointController {
 
     this._tripEventEdit.getElement().querySelector(`.event__reset-btn`)
       .addEventListener(`click`, () => {
-        this._onDataChange(null, this._data);
+        // this._onDataChange(null, this._data);
+        this._onDataChange(`delete`, this._data);
       });
 
     render(this._container, currentView.getElement(), renderPosition);
