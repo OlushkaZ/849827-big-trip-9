@@ -149,14 +149,15 @@ export class PointController {
        evt.preventDefault();
 
        const formData = new FormData(this._tripEventEdit.getElement());
+       const newPoint = Object.create(this._data);
 
-       this._data.type = formData.get(`event-type`);
-       this._data.destination = currentDestination;
-       this._data.isFavorite = formData.get(`event-favorite`) ? true : false;
-       this._data.startDate = moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate();
-       this._data.finishDate = moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate();
-       this._data.price = formData.get(`event-price`);
-       this._data.offers = this._getOffers();
+       newPoint.type = formData.get(`event-type`);
+       newPoint.destination = currentDestination;
+       newPoint.isFavorite = formData.get(`event-favorite`) ? true : false;
+       newPoint.startDate = moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate();
+       newPoint.finishDate = moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate();
+       newPoint.price = Number(formData.get(`event-price`));
+       newPoint.offers = this._getOffers();
 
        // const entry = {
        //   type: formData.get(`event-type`),
@@ -169,7 +170,7 @@ export class PointController {
        //   offers: this._getOffers()
        // };
 
-       this._onDataChange(`update`, mode === Mode.DEFAULT ? this._data : null);
+       this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
        // this._onDataChange(entry, mode === Mode.DEFAULT ? this._data : null);
        // this._onDataChange(entry, this._data);
        document.removeEventListener(`keydown`, onEscKeyDown);
@@ -205,7 +206,7 @@ export class PointController {
     offerChecks.forEach(function (item, ind) {
       const offer = {};
       offer.title = offerTitle[ind].textContent;
-      offer.price = offerPrice[ind].textContent;
+      offer.price = Number(offerPrice[ind].textContent);
       offer.accepted = item.checked;
       offers.push(offer);
     });

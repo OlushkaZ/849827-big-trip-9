@@ -95,10 +95,10 @@ export class TripController {
           id: update.id,
           data: update.toRAW()
         })
+        .then(() => api.getPoints())
         .then((tasks) => {
           this._eventList.getElement().innerHTML = ``;
-          //обновить точку в массиве ???
-          // this._tripPoints = tasks;
+          this._tripPoints = tasks;
           this._renderEventList(this._tripPoints);
         });
         break;
