@@ -1,38 +1,45 @@
-import {tripPointTypes, destinations} from '../data.js';
+// import {destinations} from '../data.js';
 import moment from 'moment';
 
 import {AbstractComponent} from './abstract-component.js';
 export class EventEditTemplate extends AbstractComponent {
-  constructor({tripPointType, destination, startDate, finishDate, price, offers, description}) {
+  constructor({type, destination, startDate, finishDate, price, offers, isFavorite}, tripPointTypes) {
     super();
-    this._tripPointType = tripPointType;
-    this._tripPointTypes = tripPointTypes;
+    this._type = type;
+    this._types = tripPointTypes;
     this._startDate = new Date(startDate);
     this._finishDate = new Date(finishDate);
-    this._destination = destination;
-    this._destinations = destinations;
+    this._destination = destination.name;
+    this._description = destination.description;
     this._price = price;
     this._offers = offers;
-    this._description = description;
+    this._pictures = destination.pictures;
+    this._isFavorite = isFavorite;
   }
 
   static getDateString(date) {
     return moment(date).format(`DD/MM/YY HH:mm`);
   }
 
-  static isMove(tripPointType) {
-    return tripPointType.move ? ` to` : ` in`;
+  _isMove(currentType) {
+    const pointType = this._types.filter((type)=>type.name === currentType)[0];
+    return pointType.move ? ` to` : ` in`;
   }
 
-  static checkMove(tripPointType) {
-    return tripPointType.move ? ` checked` : ``;
-  }
+  // _checkMove(currentType) {
+  //   const pointType = this._types.filter((type)=>type.name === currentType)[0];
+  //   return pointType.move ? ` checked` : ``;
+  // }
 
-  static getPhotos() {
-    return new Array(Math.floor(Math.random() * 4) + 1).fill(``).map(()=>`
-     <img class="event__photo" src="http://picsum.photos/300/150?r=${Math.random()}" alt="Event photo">
+  _getPhotos() {
+    return this._pictures.map((picture)=>`<img class="event__photo" src="${picture.src}" alt="${picture.description}">
      `).join(``);
   }
+  // getPhotos() {
+  //   return new Array(Math.floor(Math.random() * 4) + 1).fill(``).map(()=>`
+  //    <img class="event__photo" src="http://picsum.photos/300/150?r=${Math.random()}" alt="Event photo">
+  //    `).join(``);
+  // }
 
   getTemplate() {
     return `<form class="event  event--edit" action="#" method="post">
@@ -40,17 +47,17 @@ export class EventEditTemplate extends AbstractComponent {
                         <div class="event__type-wrapper">
                           <label class="event__type  event__type-btn" for="event-type-toggle-1">
                             <span class="visually-hidden">Choose event type</span>
-                            ${this._tripPointType ? `<img class="event__type-icon" width="17" height="17" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">` : ``}
+                            ${this._type ? `<img class="event__type-icon" width="17" height="17" src="img/icons/${this._type}.png" alt="Event type icon">` : ``}
                           </label>
-                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${EventEditTemplate.checkMove(this._tripPointType)}>
+                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
                           <div class="event__type-list">
                             <fieldset class="event__type-group">
                               <legend class="visually-hidden">Transfer</legend>
 
-                              ${this._tripPointTypes.map((type) =>type.move ? `
+                              ${this._types.map((type) =>type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._type ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -59,9 +66,9 @@ export class EventEditTemplate extends AbstractComponent {
                             <fieldset class="event__type-group">
                               <legend class="visually-hidden">Activity</legend>
 
-                              ${this._tripPointTypes.map((type) => !type.move ? `
+                              ${this._types.map((type) => !type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._type ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -71,13 +78,11 @@ export class EventEditTemplate extends AbstractComponent {
 
                         <div class="event__field-group  event__field-group--destination">
                           <label class="event__label  event__type-output" for="event-destination-1">
-                            ${this._tripPointType.name} ${EventEditTemplate.isMove(this._tripPointType)}
+                            ${this._type} ${this._isMove(this._type)}
                           </label>
-                          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._destination}" list="destination-list-1">
+                          <input class="event__input  event__input--destination" id="event-destination-1" name="event-destination" value="${this._destination}" list="destination-list-1">
                           <datalist id="destination-list-1">
-                            ${this._destinations.map((dest)=>`
-                              <option value="${dest}"></option>
-                              `).join(``)}
+
                           </datalist>
                         </div>
 
@@ -104,7 +109,7 @@ export class EventEditTemplate extends AbstractComponent {
                         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                         <button class="event__reset-btn" type="reset">Delete</button>
 
-                        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+                        <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite ? `checked` : ``}>
                         <label class="event__favorite-btn" for="event-favorite-1">
                           <span class="visually-hidden">Add to favorite</span>
                           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -125,9 +130,9 @@ export class EventEditTemplate extends AbstractComponent {
                           <div class="event__available-offers">
                             ${this._offers.map((offer)=>`
                             <div class="event__offer-selector">
-                              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name}-1" type="checkbox" name="${offer.name}" ${(Math.round(Math.random())) ? `` : `checked`}>
-                              <label class="event__offer-label" for="event-offer-${offer.name}-1">
-                                <span class="event__offer-title">${offer.name}</span>
+                              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="${offer.title}" ${offer.accepted ? `checked` : ``}>
+                              <label class="event__offer-label" for="event-offer-${offer.title}-1">
+                                <span class="event__offer-title">${offer.title}</span>
                                 &plus;
                                 &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
                               </label>
@@ -142,7 +147,7 @@ export class EventEditTemplate extends AbstractComponent {
 
                           <div class="event__photos-container">
                             <div class="event__photos-tape">
-                            ${EventEditTemplate.getPhotos()}
+                            ${this._getPhotos()}
                             </div>
                           </div>
                         </section>

@@ -4,6 +4,7 @@ import {NoPointsTemplate} from '../components/no-points.js';
 import {SortingList} from '../components/sorting-list.js';
 import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
+import {api} from '../main.js';
 const PointControllerMode = Mode;
 
 export class TripController {
@@ -17,6 +18,8 @@ export class TripController {
     this._creatingTripPoint = null;
     this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = this._onDataChange.bind(this);
+    // this._api = api;
+    this.init();
   }
   init() {
     if (this._tripPoints.length === 0) {
@@ -49,7 +52,7 @@ export class TripController {
     this._creatingTripPoint = true;
     // this._onDataChange(defaultPoint, null);
     const container = this._container.querySelector(`.trip-days`);
-    this._creatingTripPoint = new PointController(container, defaultPoint, PointControllerMode.ADDING, this._onChangeView, this._onDataChange);
+    this._creatingTripPoint = new PointController(container, defaultPoint, PointControllerMode.ADDING, this._onDataChange, this._onChangeView);
   }
 
   _renderDays() {
@@ -85,26 +88,52 @@ export class TripController {
   _onChangeView() {
     this._subscriptions.forEach((it) => it());
   }
-
-  _onDataChange(newData, oldData) {
-    const index = this._tripPoints.findIndex((point) => point === oldData);
-
-    if (newData === null && oldData === null) {
-      this._creatingTripPoint = null;
+  _onDataChange(actionType, update) {
+    switch (actionType) {
+      case `update`:
+        api.updatePoint({
+          id: update.id,
+          data: update.toRAW()
+        })
+        .then(() => api.getPoints())
+        .then((tasks) => {
+          this._eventList.getElement().innerHTML = ``;
+          this._tripPoints = tasks;
+          this._renderEventList(this._tripPoints);
+        });
+        break;
+      case `delete`:
+        api.deletePoint({
+          id: update.id
+        })
+          .then(() => api.getPoints())
+          .then((tasks) => {
+            this._eventList.getElement().innerHTML = ``;
+            this._tripPoints = tasks;
+            this._renderEventList(this._tripPoints);
+          });
+        break;
     }
-
-    if (newData === null) {
-      this._tripPoints = [...this._tripPoints.slice(0, index), ...this._tripPoints.slice(index + 1)];
-      // this._showedPoints = Math.min(this._showedPoints, this._tripPoints.length);
-    } else if (oldData === null) {
-      this._creatingTripPoint = null;
-      this._tripPoints = [newData, ...this._tripPoints];
-    } else {
-      this._tripPoints[index] = newData;
-    }
-
-    this._renderEventList(this._tripPoints);
   }
+  // _onDataChange(newData, oldData) {
+  //   const index = this._tripPoints.findIndex((point) => point === oldData);
+  //
+  //   if (newData === null && oldData === null) {
+  //     this._creatingTripPoint = null;
+  //   }
+  //
+  //   if (newData === null) {
+  //     this._tripPoints = [...this._tripPoints.slice(0, index), ...this._tripPoints.slice(index + 1)];
+  //     // this._showedPoints = Math.min(this._showedPoints, this._tripPoints.length);
+  //   } else if (oldData === null) {
+  //     this._creatingTripPoint = null;
+  //     this._tripPoints = [newData, ...this._tripPoints];
+  //   } else {
+  //     this._tripPoints[index] = newData;
+  //   }
+  //
+  //   this._renderEventList(this._tripPoints);
+  // }
 
   _onSortLinkClick(evt) {
     evt.preventDefault();
