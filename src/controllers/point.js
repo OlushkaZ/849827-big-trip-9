@@ -159,20 +159,8 @@ export class PointController {
        newPoint.price = Number(formData.get(`event-price`));
        newPoint.offers = this._getOffers();
 
-       // const entry = {
-       //   type: formData.get(`event-type`),
-       //   destination: currentDestination,
-       //   id: this._data.id,
-       //   isFavorite: formData.get(`event-favorite`) ? true : false,
-       //   startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
-       //   finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
-       //   price: formData.get(`event-price`),
-       //   offers: this._getOffers()
-       // };
-
        this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
-       // this._onDataChange(entry, mode === Mode.DEFAULT ? this._data : null);
-       // this._onDataChange(entry, this._data);
+
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
 
