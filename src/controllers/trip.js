@@ -88,7 +88,8 @@ export class TripController {
   _onChangeView() {
     this._subscriptions.forEach((it) => it());
   }
-  _onDataChange(actionType, update) {
+  _onDataChange(actionType, update, shake, unblock) {
+    // eventTemplate.block();
     switch (actionType) {
       case `update`:
         api.updatePoint({
@@ -106,11 +107,21 @@ export class TripController {
         api.deletePoint({
           id: update.id
         })
-          .then(() => api.getPoints())
+          .then((response) => {
+            if (response.ok) {
+              // shake();
+              return api.getPoints();
+            }
+            throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
+          })
           .then((tasks) => {
             this._eventList.getElement().innerHTML = ``;
             this._tripPoints = tasks;
             this._renderEventList(this._tripPoints);
+          })
+          .catch(() => {
+            shake();
+            unblock();
           });
         break;
     }

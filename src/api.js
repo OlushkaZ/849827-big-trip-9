@@ -59,6 +59,7 @@ export const API = class {
   }
 
   deletePoint({id}) {
+
     return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 

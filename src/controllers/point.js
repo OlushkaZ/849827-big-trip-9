@@ -7,8 +7,7 @@ import moment from 'moment';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import 'flatpickr/dist/themes/light.css';
-// const flatpickr = require(`flatpickr`);
-// import flatpickr from 'https://cdn.jsdelivr.net/npm/flatpickr';
+
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`
@@ -36,7 +35,8 @@ export class PointController {
     this._tripEventEdit = new EventEditTemplate(data, tripPointTypes);
     this._tripEventNew = new EventNewTemplate(data, tripPointTypes);
     this._api = api;
-    // this._arr = [];
+    this.shake = this.shake.bind(this);
+    this.unblock = this.unblock.bind(this);
 
     this.init(mode);
   }
@@ -49,7 +49,6 @@ export class PointController {
       renderPosition = Position.BEFOREBEGIN;
       currentView = this._tripEventNew;
     }
-    let currentDestination = this._data.destination;
     const onTypeChoose = (evt)=>{
       if (evt.target.tagName === `INPUT`) {
         const pointType = tripPointTypes.filter((type)=>type.name === evt.target.value)[0];
@@ -68,6 +67,8 @@ export class PointController {
     typeToggle.addEventListener(`change`, ()=>
       typeList.addEventListener(`click`, onTypeChoose)
     );
+
+    let currentDestination = this._data.destination;
     const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
     while (destinationList.firstElementChild) {
       destinationList.removeChild(destinationList.firstElementChild);
@@ -92,7 +93,6 @@ export class PointController {
       // render(destinationPhotoContainer, createElement(getPhotos(pictures)), Position.BEFOREEND);
     };
     const onDestinationChange = (evt) =>{
-      // Array.from(destinationList.children).map();
       const newDestination = evt.target.value;
       this._api.getDestinations().then((destinations) => destinations
           .filter(({name})=> name === newDestination))
@@ -101,8 +101,6 @@ export class PointController {
             fillDesinationDescription(dest.description);
             fillDesinationPhotos(dest.pictures);
           });
-      // .then(([dest])=>fillDesinationPhotos(dest.pictures));
-      // .then(([dest])=>render(destinationList, dest.description, Position.BEFOREEND));
     };
     this._tripEventEdit.getElement()
               .querySelector(`.event__input--destination`)
@@ -120,9 +118,8 @@ export class PointController {
         } else if (mode === Mode.ADDING) {
           this._container.removeChild(currentView.getElement());
           // Захотели создать карточку, но не стали ее сохранять
-          this._onDataChange(null, null);
+          // this._onDataChange(null, null);
         }
-        // this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
@@ -159,20 +156,8 @@ export class PointController {
        newPoint.price = Number(formData.get(`event-price`));
        newPoint.offers = this._getOffers();
 
-       // const entry = {
-       //   type: formData.get(`event-type`),
-       //   destination: currentDestination,
-       //   id: this._data.id,
-       //   isFavorite: formData.get(`event-favorite`) ? true : false,
-       //   startDate: moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
-       //   finishDate: moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate().getTime(),
-       //   price: formData.get(`event-price`),
-       //   offers: this._getOffers()
-       // };
-
        this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
-       // this._onDataChange(entry, mode === Mode.DEFAULT ? this._data : null);
-       // this._onDataChange(entry, this._data);
+
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
 
@@ -189,13 +174,13 @@ export class PointController {
             });
 
     this._tripEventEdit.getElement().querySelector(`.event__reset-btn`)
-      .addEventListener(`click`, () => {
-        // this._onDataChange(null, this._data);
-        this._onDataChange(`delete`, this._data);
+      .addEventListener(`click`, (evt) => {
+        this.block();
+        evt.target.textContent = `Deleting...`;
+        this._onDataChange(`delete`, this._data, this.shake, this.unblock);
       });
 
     render(this._container, currentView.getElement(), renderPosition);
-  // render(this._container.getElement(), currentView.getElement(), renderPosition);
   }
 
   _getOffers() {
@@ -212,15 +197,32 @@ export class PointController {
     });
     return offers;
   }
-  _getEventType() {
-    const typeCheckbox = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
-    const inputs = this._tripEventEdit.getElement().querySelectorAll(`.event__type-input`);
-    const eventTypeInput = Array.from(inputs).filter((input)=>input.checked);
-    // const type = eventTypeInput[0].parentNode.parentNode.textContent
-    const eventType = {};
-    eventType.name = eventTypeInput[0].value;
-    eventType.move = typeCheckbox.checked;
-    return eventType;
+  // _getEventType() {
+  //   const typeCheckbox = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
+  //   const inputs = this._tripEventEdit.getElement().querySelectorAll(`.event__type-input`);
+  //   const eventTypeInput = Array.from(inputs).filter((input)=>input.checked);
+  //   const eventType = {};
+  //   eventType.name = eventTypeInput[0].value;
+  //   eventType.move = typeCheckbox.checked;
+  //   return eventType;
+  // }
+  shake() {
+    const ANIMATION_TIMEOUT = 600;
+    this._tripEventEdit.getElement().style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+    this._tripEventEdit.getElement().style.border = `2px solid red`;
+    setTimeout(() => {
+      this._tripEventEdit.getElement().style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+  }
+
+  block() {
+    this._tripEventEdit.getElement().querySelector(`.event__save-btn`).disabled = true;
+    this._tripEventEdit.getElement().querySelector(`.event__reset-btn`).disabled = true;
+  }
+
+  unblock() {
+    this._tripEventEdit.getElement().querySelector(`.event__save-btn`).disabled = false;
+    this._tripEventEdit.getElement().querySelector(`.event__reset-btn`).disabled = false;
   }
 
   setDefaultView() {
