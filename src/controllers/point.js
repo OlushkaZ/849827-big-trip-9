@@ -1,5 +1,8 @@
 import {EventTemplate} from '../components/trip-event.js';
 import {EventEditTemplate} from '../components/trip-event-edit.js';
+import {EventEditTemplateOffers} from '../components/trip-event-edit-offers.js';
+import {EventEditTemplateDetails} from '../components/trip-event-edit-details.js';
+import {EventEditTemplateDestination} from '../components/trip-event-edit-destination.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
 import {render, createElement, Position, Key} from '../utils.js';
 import {api} from '../main.js';
@@ -26,13 +29,17 @@ const tripPointTypes = [
 ];
 
 export class PointController {
-  constructor(container, data, mode, onDataChange, onChangeView) {
+  constructor(container, data, mode, onDataChange, onChangeView, deleteNewPoint) {
     this._container = container;
     this._data = data;
     this._onChangeView = onChangeView;
     this._onDataChange = onDataChange;
+    this._deleteNewPoint = deleteNewPoint;
     this._tripEvent = new EventTemplate(data, tripPointTypes);
     this._tripEventEdit = new EventEditTemplate(data, tripPointTypes);
+    this._tripEventEditDetails = new EventEditTemplateDetails(data, tripPointTypes);
+    this._tripEventEditOffers = new EventEditTemplateOffers(data, tripPointTypes);
+    this._tripEventEditDestination = new EventEditTemplateDestination(data, tripPointTypes);
     this._tripEventNew = new EventNewTemplate(data, tripPointTypes);
     this._api = api;
     this.shake = this.shake.bind(this);
@@ -46,7 +53,7 @@ export class PointController {
     let currentView = this._tripEvent;
 
     if (mode === Mode.ADDING) {
-      renderPosition = Position.BEFOREBEGIN;
+      renderPosition = Position.AFTEREND;
       currentView = this._tripEventNew;
     }
     const onTypeChoose = (evt)=>{
@@ -62,50 +69,56 @@ export class PointController {
         typeList.removeEventListener(`click`, onTypeChoose);
       }
     };
-    const typeList = this._tripEventEdit.getElement().querySelector(`.event__type-list`);
-    const typeToggle = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
-    typeToggle.addEventListener(`change`, ()=>
-      typeList.addEventListener(`click`, onTypeChoose)
-    );
-
     let currentDestination = this._data.destination;
-    const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
-    while (destinationList.firstElementChild) {
-      destinationList.removeChild(destinationList.firstElementChild);
-    }
-    this._api.getDestinations().then((destinations) => destinations
+    // if (mode !== Mode.ADDING) {
+      const typeList = this._tripEventEdit.getElement().querySelector(`.event__type-list`);
+      const typeToggle = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
+      typeToggle.addEventListener(`change`, ()=>
+        typeList.addEventListener(`click`, onTypeChoose)
+      );
+
+
+      const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
+      while (destinationList.firstElementChild) {
+        destinationList.removeChild(destinationList.firstElementChild);
+      }
+      this._api.getDestinations().then((destinations) => destinations
        .map(({name}) => render(destinationList, `<option value="` + name + `">`, Position.BEFOREEND)));
-    const destinationDescriptionContainer = this._tripEventEdit.getElement()
+      const destinationDescriptionContainer = this._tripEventEditDestination.getElement()
        .querySelector(`.event__destination-description`);
-    const fillDesinationDescription = (desc)=>{
-      destinationDescriptionContainer.textContent = desc;
-    };
-    const destinationPhotoContainer = this._tripEventEdit.getElement()
+      const fillDesinationDescription = (desc)=>{
+        destinationDescriptionContainer.textContent = desc;
+      };
+      const destinationPhotoContainer = this._tripEventEditDestination.getElement()
        .querySelector(`.event__photos-tape`);
 
-    const getPhotoTemplate = (pict)=>`<img class="event__photo" src="${pict.src}" alt="${pict.description}">`;
+      const getPhotoTemplate = (pict)=>`<img class="event__photo" src="${pict.src}" alt="${pict.description}">`;
 
-    const fillDesinationPhotos = (pictures)=>{
-      while (destinationPhotoContainer.firstElementChild) {
-        destinationPhotoContainer.removeChild(destinationPhotoContainer.firstElementChild);
-      }
-      pictures.map((pict)=>render(destinationPhotoContainer, createElement(getPhotoTemplate(pict)), Position.BEFOREEND));
+      const fillDesinationPhotos = (pictures)=>{
+        while (destinationPhotoContainer.firstElementChild) {
+          destinationPhotoContainer.removeChild(destinationPhotoContainer.firstElementChild);
+        }
+        pictures.map((pict)=>render(destinationPhotoContainer, createElement(getPhotoTemplate(pict)), Position.BEFOREEND));
       // render(destinationPhotoContainer, createElement(getPhotos(pictures)), Position.BEFOREEND);
-    };
-    const onDestinationChange = (evt) =>{
-      const newDestination = evt.target.value;
-      this._api.getDestinations().then((destinations) => destinations
+      };
+      const onDestinationChange = (evt) =>{
+        const newDestination = evt.target.value;
+        this._api.getDestinations().then((destinations) => destinations
           .filter(({name})=> name === newDestination))
           .then(([dest])=>{
             currentDestination = dest;
-            fillDesinationDescription(dest.description);
-            fillDesinationPhotos(dest.pictures);
+            if (dest.description) {
+              fillDesinationDescription(dest.description);
+            }
+            if (dest.pictures) {
+              fillDesinationPhotos(dest.pictures);
+            }
           });
-    };
-    this._tripEventEdit.getElement()
+      };
+      this._tripEventEdit.getElement()
               .querySelector(`.event__input--destination`)
               .addEventListener(`change`, onDestinationChange);
-
+    // }
 
     const onEscKeyDown = (evt) => {
       if (evt.key === Key.ESCAPE || evt.key === Key.ESCAPE_IE) {
@@ -128,8 +141,16 @@ export class PointController {
        .querySelector(`.event__rollup-btn`)
        .addEventListener(`click`, (evt) => {
          evt.preventDefault();
+         this._deleteNewPoint();
          this._onChangeView();
          this._container.replaceChild(this._tripEventEdit.getElement(), this._tripEvent.getElement());
+         render(this._tripEventEdit.getElement(), this._tripEventEditDetails.getElement(), Position.BEFOREEND);
+         if (this._data.offers.length > 0) {
+           render(this._tripEventEdit.getElement(), this._tripEventEditOffers.getElement(), Position.BEFOREEND);
+         }
+         if (this._data.destination.description) {
+           render(this._tripEventEdit.getElement(), this._tripEventEditDestination.getElement(), Position.BEFOREEND);
+         }
          document.addEventListener(`keydown`, onEscKeyDown);
        });
 

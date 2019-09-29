@@ -83,7 +83,7 @@ renderSiteFilterTemplate();
 const newEventButton = tripMainElement.querySelector(`.trip-main__event-add-btn`);
 newEventButton.addEventListener(`click`, (evt) => {
   evt.preventDefault();
-  // tripController.createTripPoint();
+  tripController.createTripPoint();
 });
 
 // const pointMocks = new Array(EVENTS_COUNT)

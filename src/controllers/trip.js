@@ -17,17 +17,20 @@ export class TripController {
     this._creatingTripPoint = null;
     this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = onDataChange;
+    this._deleteNewPoint = this._deleteNewPoint.bind(this);
     this._currentSorting = `sort-event`;
   }
 
   show(points) {
     this._tripPoints = points;
 
-    this._container.innerHTML = ``;
-    this._eventList.getElement().innerHTML = ``;
+    // this._container.innerHTML = ``;
+    // this._eventList.getElement().innerHTML = ``;
+    unrender(this._eventList);
     if (this._tripPoints.length === 0) {
+      unrender(this._sort);
       render(this._container, this._noPointsTemplate.getElement(), Position.BEFOREEND);
-    } else {//если точек больше одной
+    } else {//если есть хоть одна точка
       render(this._container, this._sort.getElement(), Position.BEFOREEND);
       this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
       render(this._container, this._eventList.getElement(), Position.BEFOREEND);
@@ -54,8 +57,14 @@ export class TripController {
 
     this._creatingTripPoint = true;
     // this._onDataChange(defaultPoint, null);
-    const container = this._container.querySelector(`.trip-days`);
-    this._creatingTripPoint = new PointController(container, defaultPoint, PointControllerMode.ADDING, this._onDataChange, this._onChangeView);
+    let container = ``;
+    if (this._tripPoints.length > 0) {
+      container = this._container.querySelector(`.trip-events__trip-sort`);
+    } else {
+      unrender(this._noPointsTemplate);
+      container = this._container.firstElementChild;
+    }
+    this._creatingTripPoint = new PointController(container, defaultPoint, PointControllerMode.ADDING, this._onDataChange, this._onChangeView, this._deleteNewPoint);
   }
 
   _renderDays() {
@@ -97,7 +106,7 @@ export class TripController {
   }
 
   _renderTripPoint(container, point) {
-    const pointController = new PointController(container, point, PointControllerMode.DEFAULT, this._onDataChange, this._onChangeView);
+    const pointController = new PointController(container, point, PointControllerMode.DEFAULT, this._onDataChange, this._onChangeView, this._deleteNewPoint);
     this._subscriptions.push(pointController.setDefaultView.bind(pointController));
   }
 
@@ -105,7 +114,18 @@ export class TripController {
     this._subscriptions.forEach((it) => it());
   }
 
+  _deleteNewPoint() {
+    if (this._creatingTripPoint) {
+      unrender(this._creatingTripPoint._tripEventNew);
+      this._creatingTripPoint = null;
+      // this.show(this._tripPoints);
+    }
+  }
+
   _onSortLinkClick(evt) {
+    if (this._creatingTripPoint) {
+      return;
+    }
     evt.preventDefault();
     if (evt.target.tagName !== `LABEL`) {
       return;

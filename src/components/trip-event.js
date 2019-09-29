@@ -17,9 +17,17 @@ export class EventTemplate extends AbstractComponent {
     return moment(date).format(` HH:mm`);
   }
 
+  // _isMove(currentType) {
+  //   const pointType = this._types.filter((type)=>type.name === currentType)[0];
+  //   return pointType.move ? ` to` : ` in`;
+  // }
+
   _isMove(currentType) {
-    const pointType = this._types.filter((type)=>type.name === currentType)[0];
-    return pointType.move ? ` to` : ` in`;
+    if (currentType) {
+      const pointType = this._types.filter((type)=>type.name === currentType)[0];
+      return pointType.move ? ` to` : ` in`;
+    }
+    return ``;
   }
 
   static getDurationTime(startDate, finishDate) {

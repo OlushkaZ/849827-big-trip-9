@@ -22,23 +22,62 @@ export class EventEditTemplate extends AbstractComponent {
   }
 
   _isMove(currentType) {
-    const pointType = this._types.filter((type)=>type.name === currentType)[0];
-    return pointType.move ? ` to` : ` in`;
+    if (currentType) {
+      const pointType = this._types.filter((type)=>type.name === currentType)[0];
+      return pointType.move ? ` to` : ` in`;
+    }
+    return ``;
   }
 
   // _checkMove(currentType) {
   //   const pointType = this._types.filter((type)=>type.name === currentType)[0];
   //   return pointType.move ? ` checked` : ``;
   // }
-
-  _getPhotos() {
-    return this._pictures.map((picture)=>`<img class="event__photo" src="${picture.src}" alt="${picture.description}">
-     `).join(``);
-  }
+  //
+  // _getPhotos() {
+  //   return this._pictures.map((picture)=>`<img class="event__photo" src="${picture.src}" alt="${picture.description}">
+  //    `).join(``);
+  // }
   // getPhotos() {
   //   return new Array(Math.floor(Math.random() * 4) + 1).fill(``).map(()=>`
   //    <img class="event__photo" src="http://picsum.photos/300/150?r=${Math.random()}" alt="Event photo">
   //    `).join(``);
+  // }
+
+  // getOffersSection() {
+  //   return `<section class="event__section  event__section--offers">
+  //                           <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+  //
+  //                           <div class="event__available-offers">
+  //                             ${this._offers.map((offer)=>`
+  //                             <div class="event__offer-selector">
+  //                               <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="${offer.title}" ${offer.accepted ? `checked` : ``}>
+  //                               <label class="event__offer-label" for="event-offer-${offer.title}-1">
+  //                                 <span class="event__offer-title">${offer.title}</span>
+  //                                 &plus;
+  //                                 &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+  //                               </label>
+  //                             </div>
+  //                             `).join(``)}
+  //                           </div>
+  //                         </section>`;
+  // }
+  // getDestinationSection() {
+  //   return `<section class="event__section  event__section--destination">
+  //     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+  //     <p class="event__destination-description">${this._description}</p>
+  //
+  //     <div class="event__photos-container">
+  //       <div class="event__photos-tape">
+  //       ${this._getPhotos()}
+  //       </div>
+  //     </div>
+  //   </section>`;
+  // }
+
+  // getDetailsSection() {
+  //   return `<section class="event__details">
+  //         </section>`;
   // }
 
   getTemplate() {
@@ -122,36 +161,10 @@ export class EventEditTemplate extends AbstractComponent {
                         </button>
                       </header>
 
-                      <section class="event__details">
-
-                        <section class="event__section  event__section--offers">
-                          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-                          <div class="event__available-offers">
-                            ${this._offers.map((offer)=>`
-                            <div class="event__offer-selector">
-                              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.title}-1" type="checkbox" name="${offer.title}" ${offer.accepted ? `checked` : ``}>
-                              <label class="event__offer-label" for="event-offer-${offer.title}-1">
-                                <span class="event__offer-title">${offer.title}</span>
-                                &plus;
-                                &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-                              </label>
-                            </div>
-                            `).join(``)}
-                          </div>
-                        </section>
-
-                        <section class="event__section  event__section--destination">
-                          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-                          <p class="event__destination-description">${this._description}</p>
-
-                          <div class="event__photos-container">
-                            <div class="event__photos-tape">
-                            ${this._getPhotos()}
-                            </div>
-                          </div>
-                        </section>
-                      </section>
                     </form>`;
   }
+  // getTemplate() {
+  //   return this.getDefaultTemplate();
+  //
+  // }
 }
