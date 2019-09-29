@@ -1,5 +1,6 @@
-const EVENTS_COUNT = 4;
-const tripPoints = [];
+// const EVENTS_COUNT = 4;
+let tripPoints = [];
+let tripController = {};
 import {SiteMenuTemplate} from './components/site-menu.js';
 import {SiteFilterTemplate} from './components/site-filter.js';
 import {RouteTemplate} from './components/current-route.js';
@@ -7,7 +8,7 @@ import {TripController} from './controllers/trip.js';
 import {Statistics} from './components/statistics.js';
 import {API} from './api.js';
 
-import {getTripPoint, filter, menu} from './data.js';
+import {filter, menu} from './data.js';
 import {render, Position} from './utils.js';
 
 const AUTHORIZATION = `Basic eo0w590ik29889aaa=${Math.random()}`;
@@ -91,7 +92,11 @@ newEventButton.addEventListener(`click`, (evt) => {
 // tripPoints.push(...pointMocks);
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-api.getPoints().then((points) => new TripController(tripEventsElement, points));
+api.getPoints().then((points) => {
+  tripController = new TripController(tripEventsElement, onDataChange);
+  tripController.show(points);
+  tripPoints = points;
+});
 // const tripController = new TripController(tripEventsElement, pointMocks);
 // tripController.init();
 render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
@@ -106,3 +111,44 @@ renderRouteTemplate();
 const tripCost = tripMainElement.querySelector(`.trip-info__cost-value`);
 const getTotalCost = () => tripPoints.reduce((sum, {price})=> sum + price, 0);
 tripCost.textContent = getTotalCost();
+
+const onDataChange = (actionType, update, shake, unblock) => {
+  // eventTemplate.block();
+  switch (actionType) {
+    case `update`:
+      api.updatePoint({
+        id: update.id,
+        data: update.toRAW()
+      })
+      .then(() => api.getPoints())
+      .then((points) => {
+        tripController.show(points);
+        // this._eventList.getElement().innerHTML = ``;
+        // this._tripPoints = tasks;
+        // this._renderEventList(this._tripPoints);
+      });
+      break;
+    case `delete`:
+      api.deletePoint({
+        id: update.id
+      })
+        .then((response) => {
+          if (response.ok) {
+            // shake();
+            return api.getPoints();
+          }
+          throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
+        })
+        .then((points) => {
+          tripController.show(points);
+          // this._eventList.getElement().innerHTML = ``;
+          // this._tripPoints = tasks;
+          // this._renderEventList(this._tripPoints);
+        })
+        .catch(() => {
+          shake();
+          unblock();
+        });
+      break;
+  }
+}
