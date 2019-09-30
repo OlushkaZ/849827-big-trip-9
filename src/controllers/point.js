@@ -115,9 +115,32 @@ export class PointController {
             }
           });
       };
-      this._tripEventEdit.getElement()
+
+    this._tripEventEdit.getElement()
               .querySelector(`.event__input--destination`)
               .addEventListener(`change`, onDestinationChange);
+/////////////////////////new////////////////////////////////////////
+    const onNewPointDestinationChange = (evt) =>{
+      render(this._tripEventNew.getElement(), this._tripEventEditDetails.getElement(), Position.BEFOREEND);
+      render(this._tripEventEditDetails.getElement(), this._tripEventEditDestination.getElement(), Position.BEFOREEND);
+
+      const newDestination = evt.target.value;
+      this._api.getDestinations().then((destinations) => destinations
+                  .filter(({name})=> name === newDestination))
+                  .then(([dest])=>{
+                    currentDestination = dest;
+                    if (dest.description) {
+                      fillDesinationDescription(dest.description);
+                    }
+                    if (dest.pictures) {
+                      fillDesinationPhotos(dest.pictures);
+                    }
+                  });
+              };
+
+    this._tripEventNew.getElement()
+              .querySelector(`.event__input--destination`)
+              .addEventListener(`change`, onNewPointDestinationChange);
     // }
 
     const onEscKeyDown = (evt) => {
@@ -146,10 +169,10 @@ export class PointController {
          this._container.replaceChild(this._tripEventEdit.getElement(), this._tripEvent.getElement());
          render(this._tripEventEdit.getElement(), this._tripEventEditDetails.getElement(), Position.BEFOREEND);
          if (this._data.offers.length > 0) {
-           render(this._tripEventEdit.getElement(), this._tripEventEditOffers.getElement(), Position.BEFOREEND);
+           render(this._tripEventEditDetails.getElement(), this._tripEventEditOffers.getElement(), Position.BEFOREEND);
          }
          if (this._data.destination.description) {
-           render(this._tripEventEdit.getElement(), this._tripEventEditDestination.getElement(), Position.BEFOREEND);
+           render(this._tripEventEditDetails.getElement(), this._tripEventEditDestination.getElement(), Position.BEFOREEND);
          }
          document.addEventListener(`keydown`, onEscKeyDown);
        });
