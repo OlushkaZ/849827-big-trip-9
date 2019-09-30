@@ -10,7 +10,8 @@ export class TripController {
   constructor(container, onDataChange) {
     this._container = container;
     this._tripPoints = [];
-    this._sort = new SortingList();
+    this._currentSorting = `sort-event`;
+    this._sort = new SortingList(this._currentSorting);
     this._eventList = new EventListTemplate();
     this._noPointsTemplate = new NoPointsTemplate();
     this._subscriptions = [];
@@ -18,7 +19,6 @@ export class TripController {
     this._onChangeView = this._onChangeView.bind(this);
     this._onDataChange = onDataChange;
     this._deleteNewPoint = this._deleteNewPoint.bind(this);
-    this._currentSorting = `sort-event`;
   }
 
   show(points) {
@@ -26,11 +26,12 @@ export class TripController {
 
     // this._container.innerHTML = ``;
     // this._eventList.getElement().innerHTML = ``;
+    unrender(this._sort);
     unrender(this._eventList);
     if (this._tripPoints.length === 0) {
-      unrender(this._sort);
       render(this._container, this._noPointsTemplate.getElement(), Position.BEFOREEND);
     } else {//если есть хоть одна точка
+      this._sort = new SortingList(this._currentSorting);
       render(this._container, this._sort.getElement(), Position.BEFOREEND);
       this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
       render(this._container, this._eventList.getElement(), Position.BEFOREEND);
