@@ -1,5 +1,6 @@
 import {ModelDestination} from './models/model-destination.js';
 import {ModelPoint} from './models/model-point.js';
+import {ModelOffer} from './models/model-offer.js';
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -36,6 +37,12 @@ export const API = class {
     return this._load({url: `destinations`})
       .then(toJSON)
       .then(ModelDestination.parseDestinations);
+  }
+
+  getOffers() {
+    return this._load({url: `offers`})
+      .then(toJSON)
+      .then(ModelOffer.parseOffers);
   }
 
   // createTask({task}) {

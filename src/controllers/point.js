@@ -4,7 +4,7 @@ import {EventEditTemplateOffers} from '../components/trip-event-edit-offers.js';
 import {EventEditTemplateDetails} from '../components/trip-event-edit-details.js';
 import {EventEditTemplateDestination} from '../components/trip-event-edit-destination.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
-import {render, createElement, Position, Key} from '../utils.js';
+import {render, unrender, createElement, Position, Key} from '../utils.js';
 import {api} from '../main.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
@@ -38,7 +38,7 @@ export class PointController {
     this._tripEvent = new EventTemplate(data, tripPointTypes);
     this._tripEventEdit = new EventEditTemplate(data, tripPointTypes);
     this._tripEventEditDetails = new EventEditTemplateDetails(data, tripPointTypes);
-    this._tripEventEditOffers = new EventEditTemplateOffers(data, tripPointTypes);
+    this._tripEventEditOffers = new EventEditTemplateOffers(data.offers);
     this._tripEventEditDestination = new EventEditTemplateDestination(data, tripPointTypes);
     this._tripEventNew = new EventNewTemplate(data, tripPointTypes);
     this._api = api;
@@ -58,24 +58,32 @@ export class PointController {
     }
     const onTypeChoose = (evt)=>{
       if (evt.target.tagName === `INPUT`) {
+        const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
         const pointType = tripPointTypes.filter((type)=>type.name === evt.target.value)[0];
 
-        this._tripEventEdit.getElement()
+        element.getElement()
                   .querySelector(`.event__label`).textContent = evt.target.value + (pointType.move ? ` to` : ` in`);
-        this._tripEventEdit.getElement()
+        element.getElement()
                   .querySelector(`.event__type-icon`).src = `img/icons/${evt.target.value}.png`;
         evt.target.checked = true;
-        typeToggle.checked = false;
+        // typeToggle.checked = false;
+        element.getElement().querySelector(`.event__type-toggle`).checked = false;
+        getNewOffers(evt);
+        if (mode === Mode.ADDING) {
+          render(this._tripEventNew.getElement(), this._tripEventEditDetails.getElement(), Position.BEFOREEND);
+        }
+        // render(this._tripEventEditDetails.getElement(), this._tripEventEditOffers.getElement(), Position.AFTERBEGIN);
+
         typeList.removeEventListener(`click`, onTypeChoose);
       }
     };
     let currentDestination = this._data.destination;
     // if (mode !== Mode.ADDING) {
-      const typeList = this._tripEventEdit.getElement().querySelector(`.event__type-list`);
-      const typeToggle = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
-      typeToggle.addEventListener(`change`, ()=>
-        typeList.addEventListener(`click`, onTypeChoose)
-      );
+    const typeList = this._tripEventEdit.getElement().querySelector(`.event__type-list`);
+    const typeToggle = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
+    typeToggle.addEventListener(`change`, ()=>
+      typeList.addEventListener(`click`, onTypeChoose)
+    );
 
 
       const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
@@ -120,6 +128,31 @@ export class PointController {
               .querySelector(`.event__input--destination`)
               .addEventListener(`change`, onDestinationChange);
 /////////////////////////new////////////////////////////////////////
+
+    const getNewOffers = (evt) =>{
+      const newPointType = evt.target.value;
+      // let newOffers = [];
+      this._api.getOffers().then((offers) => offers
+                     .filter(({type})=> type === newPointType))
+                     .then(([offer])=> {
+                       renderNewoffers(offer.offers);
+                     });
+    };
+
+    const renderNewoffers = (offers) => {
+      unrender(this._tripEventEditOffers);
+      this._tripEventEditOffers = new EventEditTemplateOffers(offers);
+      if (offers.length > 0) {
+        render(this._tripEventEditDetails.getElement(), this._tripEventEditOffers.getElement(), Position.AFTERBEGIN);
+      }
+
+    };
+    const newPointtypeList = this._tripEventNew.getElement().querySelector(`.event__type-list`);
+    const newPointtypeToggle = this._tripEventNew.getElement().querySelector(`.event__type-toggle`);
+    newPointtypeToggle.addEventListener(`change`, ()=>
+      newPointtypeList.addEventListener(`click`, onTypeChoose)
+    );
+
     const onNewPointDestinationChange = (evt) =>{
       render(this._tripEventNew.getElement(), this._tripEventEditDetails.getElement(), Position.BEFOREEND);
       render(this._tripEventEditDetails.getElement(), this._tripEventEditDestination.getElement(), Position.BEFOREEND);
@@ -136,7 +169,7 @@ export class PointController {
                       fillDesinationPhotos(dest.pictures);
                     }
                   });
-              };
+    };
 
     this._tripEventNew.getElement()
               .querySelector(`.event__input--destination`)

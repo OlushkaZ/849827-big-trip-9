@@ -46,6 +46,7 @@ export class TripController {
     if (this._creatingTripPoint) {
       return;
     }
+    this._onChangeView();
 
     const defaultPoint = {
       // description: ``,
