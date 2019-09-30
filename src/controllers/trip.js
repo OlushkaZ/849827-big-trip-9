@@ -5,6 +5,7 @@ import {SortingList} from '../components/sorting-list.js';
 import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
 const PointControllerMode = Mode;
+const DEFAULT_POINT_TYPE = `flight`;
 
 export class TripController {
   constructor(container, onDataChange) {
@@ -50,8 +51,8 @@ export class TripController {
       // description: ``,
       startDate: new Date(),
       finishDate: new Date(),
-      destination: [],
-      tripPointType: {},
+      destination: {},
+      type: DEFAULT_POINT_TYPE,
       price: 0,
       offers: [],
     };

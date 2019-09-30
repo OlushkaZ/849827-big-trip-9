@@ -1,32 +1,41 @@
-import {tripPointTypes, destinations} from '../data.js';
+// import {tripPointTypes, destinations} from '../data.js';
 import moment from 'moment';
 
 import {AbstractComponent} from './abstract-component.js';
 export class EventNewTemplate extends AbstractComponent {
-  constructor({tripPointType, destination, startDate, finishDate, price, offers, description}) {
+  constructor({type, startDate, finishDate, price, offers}, tripPointTypes) {
     super();
-    this._tripPointType = tripPointType;
-    this._tripPointTypes = tripPointTypes;
+    this._type = type;
+    this._types = tripPointTypes;
     this._startDate = new Date(startDate);
     this._finishDate = new Date(finishDate);
-    this._destination = destination;
-    this._destinations = destinations;
+    // this._destination = destination.name;
+    // this._description = destination.description;
     this._price = price;
     this._offers = offers;
-    this._description = description;
+    // this._pictures = destination.pictures;
+    // this._isFavorite = isFavorite;
   }
 
   static getDateString(date) {
     return moment(date).format(`DD/MM/YY HH:mm`);
   }
 
-  static isMove(tripPointType) {
-    return tripPointType.move ? ` to` : ` in`;
+  // static isMove(tripPointType) {
+  //   return tripPointType.move ? ` to` : ` in`;
+  // }
+
+  _isMove(currentType) {
+    if (currentType) {
+      const pointType = this._types.filter((type)=>type.name === currentType)[0];
+      return pointType.move ? ` to` : ` in`;
+    }
+    return ``;
   }
 
-  static checkMove(tripPointType) {
-    return tripPointType.move ? ` checked` : ``;
-  }
+  // static checkMove(tripPointType) {
+  //   return tripPointType.move ? ` checked` : ``;
+  // }
 
   // static getPhotos() {
   //   return new Array(Math.floor(Math.random() * 4) + 1).fill(``).map(()=>`
@@ -40,17 +49,17 @@ export class EventNewTemplate extends AbstractComponent {
                         <div class="event__type-wrapper">
                           <label class="event__type  event__type-btn" for="event-type-toggle-1">
                             <span class="visually-hidden">Choose event type</span>
-                            ${this._tripPointType ? `<img class="event__type-icon" width="17" height="17" src="img/icons/${this._tripPointType.name}.png" alt="Event type icon">` : ``}
+                            ${this._type ? `<img class="event__type-icon" width="17" height="17" src="img/icons/${this._type}.png" alt="Event type icon">` : ``}
                           </label>
-                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${EventNewTemplate.checkMove(this._tripPointType)}>
+                          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
                           <div class="event__type-list">
                             <fieldset class="event__type-group">
                               <legend class="visually-hidden">Transfer</legend>
 
-                              ${this._tripPointTypes.map((type) =>type.move ? `
+                              ${this._types.map((type) =>type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._type ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -59,9 +68,9 @@ export class EventNewTemplate extends AbstractComponent {
                             <fieldset class="event__type-group">
                               <legend class="visually-hidden">Activity</legend>
 
-                              ${this._tripPointTypes.map((type) => !type.move ? `
+                              ${this._types.map((type) => !type.move ? `
                                 <div class="event__type-item">
-                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._tripPointType.name ? `checked` : ``}>
+                                  <input id="event-type-${type.name}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type.name}" ${type.name === this._type ? `checked` : ``}>
                                   <label class="event__type-label  event__type-label--${type.name}" for="event-type-${type.name}-1">${type.name}</label>
                                 </div>
                                 ` : ``).join(``)}
@@ -71,13 +80,11 @@ export class EventNewTemplate extends AbstractComponent {
 
                         <div class="event__field-group  event__field-group--destination">
                           <label class="event__label  event__type-output" for="event-destination-1">
-                            ${this._tripPointType.name} ${EventNewTemplate.isMove(this._tripPointType)}
+                            ${this._type} ${this._isMove(this._type)}
                           </label>
-                          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._destination}" list="destination-list-1">
+                          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
                           <datalist id="destination-list-1">
-                            ${this._destinations.map((dest)=>`
-                              <option value="${dest}"></option>
-                              `).join(``)}
+
                           </datalist>
                         </div>
 
