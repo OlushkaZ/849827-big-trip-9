@@ -194,11 +194,28 @@ export class PointController {
               });
             });
 
+    this._tripEventNew
+              .getElement()
+              .querySelectorAll(`.event__input--time`).forEach((timeInput)=>{
+                flatpickr(timeInput, {
+                  enableTime: true,
+                  altInput: true,
+                  allowInput: true,
+                  defaultDate: moment(timeInput.value, `DD-MM-YY HH:mm`).toDate().getTime(),
+                  altFormat: `d/m/y H:i`,
+                });
+              });
+
     this._tripEventEdit.getElement().querySelector(`.event__reset-btn`)
       .addEventListener(`click`, (evt) => {
         this.block();
         evt.target.textContent = `Deleting...`;
         this._onDataChange(`delete`, this._data, this.shake, this.unblock);
+      });
+
+    this._tripEventNew.getElement().querySelector(`.event__reset-btn`)
+      .addEventListener(`click`, () => {
+        this._deleteNewPoint();
       });
 
     render(this._container, currentView.getElement(), renderPosition);
