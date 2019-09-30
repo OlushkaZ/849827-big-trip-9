@@ -34,8 +34,8 @@ export class TripController {
       this._sort = new SortingList(this._currentSorting);
       render(this._container, this._sort.getElement(), Position.BEFOREEND);
       this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
-      render(this._container, this._eventList.getElement(), Position.BEFOREEND);
 
+      render(this._container, this._eventList.getElement(), Position.BEFOREEND);
       this._renderEvents();
     }
   }
@@ -47,7 +47,7 @@ export class TripController {
     }
 
     const defaultPoint = {
-      description: ``,
+      // description: ``,
       startDate: new Date(),
       finishDate: new Date(),
       destination: [],
@@ -82,7 +82,7 @@ export class TripController {
   _renderEvents() {
     switch (this._currentSorting) {
       case `sort-event`:
-        TripDayTemplate.count = null;
+        // TripDayTemplate.count = null;
         this._renderDays();
         const containers = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByStartTime = this._tripPoints.slice().sort((a, b) => a.startDate - b.startDate);
@@ -124,9 +124,9 @@ export class TripController {
   }
 
   _onSortLinkClick(evt) {
-    if (this._creatingTripPoint) {
-      return;
-    }
+    // if (this._creatingTripPoint) {
+    //   return;
+    // }
     evt.preventDefault();
     if (evt.target.tagName !== `LABEL`) {
       return;
