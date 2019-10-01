@@ -31,4 +31,16 @@ export class ModelPoint {
       'type': this.type,
     };
   }
+
+  static toRAWNewPoint(point) {
+    return {
+      'base_price': point.price,
+      'date_from': point.startDate.getTime(),
+      'date_to': point.finishDate.getTime(),
+      'destination': point.destination,
+      'is_favorite': point.isFavorite,
+      'offers': [...point.offers.values()],
+      'type': point.type,
+    };
+  }
 }

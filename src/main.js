@@ -4,12 +4,13 @@ let tripController = {};
 import {SiteMenuTemplate} from './components/site-menu.js';
 import {SiteFilterTemplate} from './components/site-filter.js';
 import {RouteTemplate} from './components/current-route.js';
+import {RouteLoadingTemplate} from './components/current-route-loading.js';
 import {TripController} from './controllers/trip.js';
 import {Statistics} from './components/statistics.js';
 import {API} from './api.js';
 
 import {filter, menu} from './data.js';
-import {render, Position} from './utils.js';
+import {render, unrender, Position} from './utils.js';
 
 const AUTHORIZATION = `Basic ao0w590ik29889aaa=${Math.random()}`;
 const END_POINT = `https://htmlacademy-es-9.appspot.com/big-trip`;
@@ -26,7 +27,7 @@ const rrr = api.getDestinations().then((destinations) => console.log(destination
 // api.getTasks().then((tasks) => boardController.show(tasks));
 
 const getRoute = ()=>{
-  const cities = tripPoints.map(({destination}) => destination);
+  const cities = tripPoints.map(({destination}) => destination.name);
   const routePoints = new Array(3);
   routePoints[0] = cities.shift();
   routePoints[2] = cities.length === 0 ? routePoints[0] : cities.pop();
@@ -91,28 +92,34 @@ newEventButton.addEventListener(`click`, (evt) => {
 // .map(getTripPoint);
 // tripPoints.push(...pointMocks);
 
+const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
+let routeLoadingTemplate;
+const renderRouteLoadingTemplate = () => {
+  routeLoadingTemplate = new RouteLoadingTemplate();
+  render(siteRouteElement, routeLoadingTemplate.getElement(), Position.AFTERBEGIN);
+};
+renderRouteLoadingTemplate();
+
+const renderRouteTemplate = () => {
+  unrender(routeLoadingTemplate);
+  const routeTemplate = new RouteTemplate(getRoute());
+  render(siteRouteElement, routeTemplate.getElement(), Position.AFTERBEGIN);
+};
 const tripEventsElement = document.querySelector(`.trip-events`);
 api.getPoints().then((points) => {
   tripController = new TripController(tripEventsElement, onDataChange);
   tripController.show(points);
   tripPoints = points;
-});
-// const tripController = new TripController(tripEventsElement, pointMocks);
-// tripController.init();
+}).then(renderRouteTemplate);
+
 render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
 
-const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
-const renderRouteTemplate = () => {
-  const routeTemplate = new RouteTemplate(getRoute());
-  render(siteRouteElement, routeTemplate.getElement(), Position.AFTERBEGIN);
-};
-renderRouteTemplate();
 
 const tripCost = tripMainElement.querySelector(`.trip-info__cost-value`);
 const getTotalCost = () => tripPoints.reduce((sum, {price})=> sum + price, 0);
 tripCost.textContent = getTotalCost();
 
-const onDataChange = (actionType, update, shake, unblock) => {
+const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
   // eventTemplate.block();
   switch (actionType) {
     case `update`:
@@ -120,18 +127,37 @@ const onDataChange = (actionType, update, shake, unblock) => {
         id: update.id,
         data: update.toRAW()
       })
-      .then(() => api.getPoints())
+      .then((response) => {
+        if (response) {
+          return api.getPoints();
+        }
+        throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
+      })
       .then((points) => {
         tripController.show(points);
+      })
+      .catch(() => {
+        shake();
+        unblock();
       });
       break;
     case `create`:
       api.createPoint({
         data: update
       })
-        .then(() => api.getPoints())
+        .then((response) => {
+          if (response) {
+            return api.getPoints();
+          }
+          throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
+        })
         .then((points) => {
+          deleteNewPoint();
           tripController.show(points);
+        })
+        .catch(() => {
+          shake();
+          unblock();
         });
       break;
     case `delete`:
@@ -140,16 +166,12 @@ const onDataChange = (actionType, update, shake, unblock) => {
       })
         .then((response) => {
           if (response.ok) {
-            // shake();
             return api.getPoints();
           }
           throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
         })
         .then((points) => {
           tripController.show(points);
-          // this._eventList.getElement().innerHTML = ``;
-          // this._tripPoints = tasks;
-          // this._renderEventList(this._tripPoints);
         })
         .catch(() => {
           shake();

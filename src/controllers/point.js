@@ -5,7 +5,7 @@ import {EventEditTemplateDetails} from '../components/trip-event-edit-details.js
 import {EventEditTemplateDestination} from '../components/trip-event-edit-destination.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
 import {ModelPoint} from '../models/model-point.js';
-import {render, unrender, createElement, Position, Key} from '../utils.js';
+import {render, unrender, createElement, isEmpty, Position, Key} from '../utils.js';
 import {api} from '../main.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
@@ -237,12 +237,22 @@ export class PointController {
        newPoint.price = Number(formData.get(`event-price`));
        newPoint.offers = this._getOffers();
 
+       this.block();
+
        // this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
        if (mode === Mode.ADDING) {
-         this._onDataChange(`create`, this.toRAWNewPoint(newPoint), this.shake, this.unblock);
-         this._deleteNewPoint();
+         const badData = this._findBadData(newPoint);
+         if (badData === null) {
+           evt.target.textContent = `Saving...`;
+           this._onDataChange(`create`, ModelPoint.toRAWNewPoint(newPoint), this.shake, this.unblock, this._deleteNewPoint);
+         } else {
+           this.shake(badData);
+           this.unblock();
+         }
+         // this._deleteNewPoint();
        } else {
-         this._onDataChange(`update`, newPoint, this.shake, this.unblock);
+         evt.target.textContent = `Saving...`;
+         this._onDataChange(`update`, newPoint, this.shake, this.unblock, this._deleteNewPoint);
        }
 
        document.removeEventListener(`keydown`, onEscKeyDown);
@@ -276,7 +286,7 @@ export class PointController {
       .addEventListener(`click`, (evt) => {
         this.block();
         evt.target.textContent = `Deleting...`;
-        this._onDataChange(`delete`, this._data, this.shake, this.unblock);
+        this._onDataChange(`delete`, this._data, this.shake, this.unblock, this._deleteNewPoint);
       });
 
     this._tripEventNew.getElement().querySelector(`.event__reset-btn`)
@@ -310,12 +320,11 @@ export class PointController {
   //   eventType.move = typeCheckbox.checked;
   //   return eventType;
   // }
-  shake() {
+  shake(element = this._tripEventEdit.getElement()) {
     const ANIMATION_TIMEOUT = 600;
-    this._tripEventEdit.getElement().style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-    this._tripEventEdit.getElement().style.border = `2px solid red`;
+    element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
     setTimeout(() => {
-      this._tripEventEdit.getElement().style.animation = ``;
+      element.style.animation = ``;
     }, ANIMATION_TIMEOUT);
   }
 
@@ -328,6 +337,15 @@ export class PointController {
     this._tripEventEdit.getElement().querySelector(`.event__save-btn`).disabled = false;
     this._tripEventEdit.getElement().querySelector(`.event__reset-btn`).disabled = false;
   }
+  _findBadData(newPoint) {
+    if (isEmpty(newPoint.destination)) {
+      return this._tripEventNew.getElement().querySelector(`.event__field-group`);
+    }
+    if (newPoint.startDate > newPoint.finishDate) {
+      return this._tripEventNew.getElement().querySelector(`.event__field-group--time`);
+    }
+    return null;
+  }
 
   setDefaultView() {
     if (this._container.contains(this._tripEventEdit.getElement())) {
@@ -335,15 +353,5 @@ export class PointController {
     }
   }
 
-  toRAWNewPoint(point) {
-    return {
-      'base_price': point.price,
-      'date_from': point.startDate.getTime(),
-      'date_to': point.finishDate.getTime(),
-      'destination': point.destination,
-      'is_favorite': point.isFavorite,
-      'offers': [...point.offers.values()],
-      'type': point.type,
-    };
-  }
+
 }

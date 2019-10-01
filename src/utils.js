@@ -40,3 +40,13 @@ export const unrender = (element)=>{
   element.removeElement();
 
 };
+
+export const isEmpty = (object)=>{
+  return JSON.stringify(object) === `{}` ? true : false;
+  // for (const key in object) {
+  //   if (object.hasOwnProperty(key)) {
+  //     return true;
+  //   }
+  // }
+  // return false;
+};

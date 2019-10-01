@@ -69,7 +69,7 @@ export class EventTemplate extends AbstractComponent {
              <span class="event__offer-title">${offer.title}</span>
              &plus;
              &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-            </li>` : ``).slice(0, 2).join(``)}
+            </li>` : ``).filter((offer)=>offer).slice(0, 3).join(``)}
 
        </ul>
 
