@@ -11,7 +11,7 @@ import {API} from './api.js';
 import {filter, menu} from './data.js';
 import {render, Position} from './utils.js';
 
-const AUTHORIZATION = `Basic eo0w590ik29889aaa=${Math.random()}`;
+const AUTHORIZATION = `Basic ao0w590ik29889aaa=${Math.random()}`;
 const END_POINT = `https://htmlacademy-es-9.appspot.com/big-trip`;
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -123,10 +123,16 @@ const onDataChange = (actionType, update, shake, unblock) => {
       .then(() => api.getPoints())
       .then((points) => {
         tripController.show(points);
-        // this._eventList.getElement().innerHTML = ``;
-        // this._tripPoints = tasks;
-        // this._renderEventList(this._tripPoints);
       });
+      break;
+    case `create`:
+      api.createPoint({
+        data: update
+      })
+        .then(() => api.getPoints())
+        .then((points) => {
+          tripController.show(points);
+        });
       break;
     case `delete`:
       api.deletePoint({

@@ -4,6 +4,7 @@ import {EventEditTemplateOffers} from '../components/trip-event-edit-offers.js';
 import {EventEditTemplateDetails} from '../components/trip-event-edit-details.js';
 import {EventEditTemplateDestination} from '../components/trip-event-edit-destination.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
+import {ModelPoint} from '../models/model-point.js';
 import {render, unrender, createElement, Position, Key} from '../utils.js';
 import {api} from '../main.js';
 import moment from 'moment';
@@ -217,14 +218,17 @@ export class PointController {
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
 
-    this._tripEventEdit.getElement()
+    const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
+    element.getElement()
      .querySelector(`.event__save-btn`)
      .addEventListener(`click`, (evt) => {
        evt.preventDefault();
 
-       const formData = new FormData(this._tripEventEdit.getElement());
+       const formData = new FormData(element.getElement());
        const newPoint = Object.create(this._data);
+       // const newPoint = Object.create(new ModelPoint());
 
+       // newPoint.id = this._data.id;
        newPoint.type = formData.get(`event-type`);
        newPoint.destination = currentDestination;
        newPoint.isFavorite = formData.get(`event-favorite`) ? true : false;
@@ -233,7 +237,13 @@ export class PointController {
        newPoint.price = Number(formData.get(`event-price`));
        newPoint.offers = this._getOffers();
 
-       this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
+       // this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
+       if (mode === Mode.ADDING) {
+         this._onDataChange(`create`, this.toRAWNewPoint(newPoint), this.shake, this.unblock);
+         this._deleteNewPoint();
+       } else {
+         this._onDataChange(`update`, newPoint, this.shake, this.unblock);
+       }
 
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
@@ -323,5 +333,17 @@ export class PointController {
     if (this._container.contains(this._tripEventEdit.getElement())) {
       this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
     }
+  }
+
+  toRAWNewPoint(point) {
+    return {
+      'base_price': point.price,
+      'date_from': point.startDate.getTime(),
+      'date_to': point.finishDate.getTime(),
+      'destination': point.destination,
+      'is_favorite': point.isFavorite,
+      'offers': [...point.offers.values()],
+      'type': point.type,
+    };
   }
 }

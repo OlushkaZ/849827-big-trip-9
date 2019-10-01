@@ -57,7 +57,7 @@ export class TripController {
       price: 0,
       offers: [],
     };
-
+    defaultPoint.finishDate.setHours(defaultPoint.finishDate.getHours() + 1);
     this._creatingTripPoint = true;
     // this._onDataChange(defaultPoint, null);
     let container = ``;

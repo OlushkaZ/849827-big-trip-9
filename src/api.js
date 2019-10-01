@@ -45,15 +45,15 @@ export const API = class {
       .then(ModelOffer.parseOffers);
   }
 
-  // createTask({task}) {
-  //   return this._load({
-  //     url: `tasks`,
-  //     method: Method.POST,
-  //     body: JSON.stringify(task),
-  //     headers: new Headers({'Content-Type': `application/json`})
-  //   })
-  //     .then(toJSON);
-  // }
+  createPoint({data}) {
+    return this._load({
+      url: `/points`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON);
+  }
 
   updatePoint({id, data}) {
     return this._load({
