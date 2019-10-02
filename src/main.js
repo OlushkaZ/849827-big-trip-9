@@ -105,19 +105,30 @@ const renderRouteTemplate = () => {
   const routeTemplate = new RouteTemplate(getRoute());
   render(siteRouteElement, routeTemplate.getElement(), Position.AFTERBEGIN);
 };
+const getTotalCost = (points)=>points
+         .slice()
+         .reduce((sum, point)=> sum + point.price + point.offers
+         .filter(({accepted})=>accepted)
+         .reduce((pointSum, {price})=> pointSum + price, 0), 0);
+
+const tripCost = tripMainElement.querySelector(`.trip-info__cost-value`);
+const renderTotalCost = () => {
+  tripCost.textContent = getTotalCost(tripPoints);
+};
 const tripEventsElement = document.querySelector(`.trip-events`);
 api.getPoints().then((points) => {
   tripController = new TripController(tripEventsElement, onDataChange);
   tripController.show(points);
   tripPoints = points;
-}).then(renderRouteTemplate);
+}).then(renderRouteTemplate).then(renderTotalCost);
 
 render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
 
-
-const tripCost = tripMainElement.querySelector(`.trip-info__cost-value`);
-const getTotalCost = () => tripPoints.reduce((sum, {price})=> sum + price, 0);
-tripCost.textContent = getTotalCost();
+const refreshPoints = (points)=>{
+  tripPoints = points;
+  renderTotalCost();
+  tripController.show(points);
+};
 
 const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
   // eventTemplate.block();
@@ -134,7 +145,7 @@ const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
         throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
       })
       .then((points) => {
-        tripController.show(points);
+        refreshPoints(points);
       })
       .catch(() => {
         shake();
@@ -153,7 +164,7 @@ const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
         })
         .then((points) => {
           deleteNewPoint();
-          tripController.show(points);
+          refreshPoints(points);
         })
         .catch(() => {
           shake();
@@ -171,7 +182,7 @@ const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
           throw new Error(`Неизвестный статус: ${response.status} ${response.statusText}`);
         })
         .then((points) => {
-          tripController.show(points);
+          refreshPoints(points);
         })
         .catch(() => {
           shake();
