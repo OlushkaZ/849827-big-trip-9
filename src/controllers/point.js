@@ -57,9 +57,12 @@ export class PointController {
       renderPosition = Position.AFTEREND;
       currentView = this._tripEventNew;
     }
+
+    const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
+
     const onTypeChoose = (evt)=>{
       if (evt.target.tagName === `INPUT`) {
-        const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
+        // const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
         const pointType = tripPointTypes.filter((type)=>type.name === evt.target.value)[0];
 
         element.getElement()
@@ -87,18 +90,18 @@ export class PointController {
     );
 
 
-      const destinationList = this._tripEventEdit.getElement().querySelector(`datalist`);
-      while (destinationList.firstElementChild) {
-        destinationList.removeChild(destinationList.firstElementChild);
-      }
-      this._api.getDestinations().then((destinations) => destinations
-       .map(({name}) => render(destinationList, `<option value="` + name + `">`, Position.BEFOREEND)));
-      const destinationDescriptionContainer = this._tripEventEditDestination.getElement()
+    const destinationList = element.getElement().querySelector(`datalist`);
+    while (destinationList.firstElementChild) {
+      destinationList.removeChild(destinationList.firstElementChild);
+    }
+    this._api.getDestinations().then((destinations) => destinations
+       .map(({name}) => render(destinationList, createElement(`<option value="` + name + `">`), Position.BEFOREEND)));
+    const destinationDescriptionContainer = this._tripEventEditDestination.getElement()
        .querySelector(`.event__destination-description`);
-      const fillDesinationDescription = (desc)=>{
-        destinationDescriptionContainer.textContent = desc;
-      };
-      const destinationPhotoContainer = this._tripEventEditDestination.getElement()
+    const fillDesinationDescription = (desc)=>{
+      destinationDescriptionContainer.textContent = desc;
+    };
+    const destinationPhotoContainer = this._tripEventEditDestination.getElement()
        .querySelector(`.event__photos-tape`);
 
       const getPhotoTemplate = (pict)=>`<img class="event__photo" src="${pict.src}" alt="${pict.description}">`;
@@ -218,7 +221,7 @@ export class PointController {
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
 
-    const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
+    // const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
     element.getElement()
      .querySelector(`.event__save-btn`)
      .addEventListener(`click`, (evt) => {
@@ -235,7 +238,7 @@ export class PointController {
        newPoint.startDate = moment(formData.get(`event-start-time`), `YYYY-MM-DD HH:mm`).toDate();
        newPoint.finishDate = moment(formData.get(`event-end-time`), `YYYY-MM-DD HH:mm`).toDate();
        newPoint.price = Number(formData.get(`event-price`));
-       newPoint.offers = this._getOffers();
+       newPoint.offers = this._getOffers(element);
 
        this.block();
 
@@ -297,10 +300,10 @@ export class PointController {
     render(this._container, currentView.getElement(), renderPosition);
   }
 
-  _getOffers() {
-    const offerChecks = this._tripEventEdit.getElement().querySelectorAll(`.event__offer-checkbox`);
-    const offerTitle = this._tripEventEdit.getElement().querySelectorAll(`.event__offer-title`);
-    const offerPrice = this._tripEventEdit.getElement().querySelectorAll(`.event__offer-price`);
+  _getOffers(element) {
+    const offerChecks = element.getElement().querySelectorAll(`.event__offer-checkbox`);
+    const offerTitle = element.getElement().querySelectorAll(`.event__offer-title`);
+    const offerPrice = element.getElement().querySelectorAll(`.event__offer-price`);
     const offers = [];
     offerChecks.forEach(function (item, ind) {
       const offer = {};
