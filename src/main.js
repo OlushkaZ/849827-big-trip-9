@@ -79,6 +79,7 @@ renderSiteMenuTemplate();
 const siteFilterTemplate = new SiteFilterTemplate(filter);
 const renderSiteFilterTemplate = () => {
   render(siteControlsElement, siteFilterTemplate.getElement(), Position.BEFOREEND);
+  siteFilterTemplate.getElement().addEventListener(`click`, (evt) => onFilterLinkClick(evt));
 };
 renderSiteFilterTemplate();
 const newEventButton = tripMainElement.querySelector(`.trip-main__event-add-btn`);
@@ -190,4 +191,15 @@ const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
         });
       break;
   }
-}
+};
+
+const onFilterLinkClick = (evt)=> {
+  evt.preventDefault();
+  if (evt.target.tagName !== `LABEL`) {
+    return;
+  }
+  tripController.setFilter(evt.target.htmlFor);
+  tripController.show(tripPoints);
+  // this._renderEvents();
+  document.getElementById(evt.target.htmlFor).checked = true;
+};

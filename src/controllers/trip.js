@@ -6,12 +6,15 @@ import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
 const PointControllerMode = Mode;
 const DEFAULT_POINT_TYPE = `flight`;
+const DEFAULT_SORTING = `sort-event`;
+const DEFAULT_FILTER = `filter-everything`;
 
 export class TripController {
   constructor(container, onDataChange) {
     this._container = container;
     this._tripPoints = [];
-    this._currentSorting = `sort-event`;
+    this._currentSorting = DEFAULT_SORTING;
+    this._currentFilter = DEFAULT_FILTER;
     this._sort = new SortingList(this._currentSorting);
     this._eventList = new EventListTemplate();
     this._noPointsTemplate = new NoPointsTemplate();
@@ -24,6 +27,10 @@ export class TripController {
 
   show(points) {
     this._tripPoints = points;
+
+    if (this._currentFilter !== DEFAULT_FILTER) {
+      this._tripPoints = this._filterPoints(this._tripPoints, this._currentFilter);
+    }
 
     // this._container.innerHTML = ``;
     // this._eventList.getElement().innerHTML = ``;
@@ -137,5 +144,23 @@ export class TripController {
     this._currentSorting = evt.target.htmlFor;
     this._renderEvents();
     document.getElementById(evt.target.htmlFor).checked = true;
+  }
+
+  setFilter(filterType) {
+    this._currentFilter = filterType;
+  }
+
+  _filterPoints(points, currentFilter) {
+    const currentDate = new Date();
+    let filteredPoints = points;
+    switch (currentFilter) {
+      case `filter-future`:
+        filteredPoints = points.filter(({startDate})=> startDate > currentDate);
+        break;
+      case `filter-past`:
+        filteredPoints = points.filter(({finishDate})=> finishDate < currentDate);
+        break;
+    }
+    return filteredPoints;
   }
 }
