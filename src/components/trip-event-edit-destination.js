@@ -3,10 +3,6 @@ import {AbstractComponent} from './abstract-component.js';
 export class EventEditTemplateDestination extends AbstractComponent {
   constructor({destination}) {
     super();
-    // this._type = type;
-    // this._types = tripPointTypes;
-    // this._startDate = new Date(startDate);
-    // this._finishDate = new Date(finishDate);
     this._destination = destination.name;
     this._description = destination.description;
     // this._price = price;

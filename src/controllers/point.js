@@ -5,7 +5,7 @@ import {EventEditTemplateDetails} from '../components/trip-event-edit-details.js
 import {EventEditTemplateDestination} from '../components/trip-event-edit-destination.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
 import {ModelPoint} from '../models/model-point.js';
-import {render, unrender, createElement, isEmpty, Position, Key} from '../utils.js';
+import {render, unrender, createElement, isEmpty, Position, Key, tripPointTypes} from '../utils.js';
 import {api} from '../main.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
@@ -16,18 +16,6 @@ export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`
 };
-const tripPointTypes = [
-  {name: `bus`, move: true},
-  {name: `flight`, move: true},
-  {name: `drive`, move: true},
-  {name: `ship`, move: true},
-  {name: `taxi`, move: true},
-  {name: `train`, move: true},
-  {name: `transport`, move: true},
-  {name: `check-in`, move: false},
-  {name: `restaurant`, move: false},
-  {name: `sightseeing`, move: false}
-];
 
 export class PointController {
   constructor(container, data, mode, onDataChange, onChangeView, deleteNewPoint) {
@@ -36,12 +24,12 @@ export class PointController {
     this._onChangeView = onChangeView;
     this._onDataChange = onDataChange;
     this._deleteNewPoint = deleteNewPoint;
-    this._tripEvent = new EventTemplate(data, tripPointTypes);
-    this._tripEventEdit = new EventEditTemplate(data, tripPointTypes);
-    this._tripEventEditDetails = new EventEditTemplateDetails(data, tripPointTypes);
+    this._tripEvent = new EventTemplate(data);
+    this._tripEventEdit = new EventEditTemplate(data);
+    this._tripEventEditDetails = new EventEditTemplateDetails(data);
     this._tripEventEditOffers = new EventEditTemplateOffers(data.offers);
-    this._tripEventEditDestination = new EventEditTemplateDestination(data, tripPointTypes);
-    this._tripEventNew = new EventNewTemplate(data, tripPointTypes);
+    this._tripEventEditDestination = new EventEditTemplateDestination(data);
+    this._tripEventNew = new EventNewTemplate(data);
     this._api = api;
     this.shake = this.shake.bind(this);
     this.unblock = this.unblock.bind(this);

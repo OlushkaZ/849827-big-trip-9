@@ -1,9 +1,10 @@
 // import {destinations} from '../data.js';
 import moment from 'moment';
+import {tripPointTypes} from '../utils.js';
 
 import {AbstractComponent} from './abstract-component.js';
 export class EventEditTemplate extends AbstractComponent {
-  constructor({type, destination, startDate, finishDate, price, offers, isFavorite}, tripPointTypes) {
+  constructor({type, destination, startDate, finishDate, price, offers, isFavorite}) {
     super();
     this._type = type;
     this._types = tripPointTypes;

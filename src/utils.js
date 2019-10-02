@@ -50,3 +50,16 @@ export const getTotalCost = (points)=>points
          .reduce((sum, point)=> sum + point.price + point.offers
          .filter(({accepted})=>accepted)
          .reduce((pointSum, {price})=> pointSum + price, 0), 0);
+
+export const tripPointTypes = [
+  {name: `bus`, move: true},
+  {name: `flight`, move: true},
+  {name: `drive`, move: true},
+  {name: `ship`, move: true},
+  {name: `taxi`, move: true},
+  {name: `train`, move: true},
+  {name: `transport`, move: true},
+  {name: `check-in`, move: false},
+  {name: `restaurant`, move: false},
+  {name: `sightseeing`, move: false}
+];
