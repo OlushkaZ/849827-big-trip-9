@@ -43,10 +43,10 @@ export const unrender = (element)=>{
 
 export const isEmpty = (object)=>{
   return JSON.stringify(object) === `{}` ? true : false;
-  // for (const key in object) {
-  //   if (object.hasOwnProperty(key)) {
-  //     return true;
-  //   }
-  // }
-  // return false;
 };
+
+export const getTotalCost = (points)=>points
+         .slice()
+         .reduce((sum, point)=> sum + point.price + point.offers
+         .filter(({accepted})=>accepted)
+         .reduce((pointSum, {price})=> pointSum + price, 0), 0);
