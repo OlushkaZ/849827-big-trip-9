@@ -133,7 +133,7 @@ export class Statistics extends AbstractComponent {
           }
         }
       });
-      cosole.log(transportChart);
+      console.log(transportChart);
     }
 
   }
@@ -183,6 +183,6 @@ export class Statistics extends AbstractComponent {
         }
       }
     });
-    cosole.log(durationChart);
+    console.log(durationChart);
   }
 }
