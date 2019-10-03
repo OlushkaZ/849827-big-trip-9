@@ -50,7 +50,6 @@ export class PointController {
 
     const onTypeChoose = (evt)=>{
       if (evt.target.tagName === `INPUT`) {
-        // const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
         const pointType = tripPointTypes.filter((type)=>type.name === evt.target.value)[0];
 
         element.getElement()
@@ -58,19 +57,16 @@ export class PointController {
         element.getElement()
                   .querySelector(`.event__type-icon`).src = `img/icons/${evt.target.value}.png`;
         evt.target.checked = true;
-        // typeToggle.checked = false;
         element.getElement().querySelector(`.event__type-toggle`).checked = false;
         getNewOffers(evt);
         if (mode === Mode.ADDING) {
           render(this._tripEventNew.getElement(), this._tripEventEditDetails.getElement(), Position.BEFOREEND);
         }
-        // render(this._tripEventEditDetails.getElement(), this._tripEventEditOffers.getElement(), Position.AFTERBEGIN);
 
         typeList.removeEventListener(`click`, onTypeChoose);
       }
     };
     let currentDestination = this._data.destination;
-    // if (mode !== Mode.ADDING) {
     const typeList = this._tripEventEdit.getElement().querySelector(`.event__type-list`);
     const typeToggle = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
     typeToggle.addEventListener(`change`, ()=>
@@ -92,18 +88,17 @@ export class PointController {
     const destinationPhotoContainer = this._tripEventEditDestination.getElement()
        .querySelector(`.event__photos-tape`);
 
-      const getPhotoTemplate = (pict)=>`<img class="event__photo" src="${pict.src}" alt="${pict.description}">`;
+    const getPhotoTemplate = (pict)=>`<img class="event__photo" src="${pict.src}" alt="${pict.description}">`;
 
-      const fillDesinationPhotos = (pictures)=>{
-        while (destinationPhotoContainer.firstElementChild) {
-          destinationPhotoContainer.removeChild(destinationPhotoContainer.firstElementChild);
-        }
-        pictures.map((pict)=>render(destinationPhotoContainer, createElement(getPhotoTemplate(pict)), Position.BEFOREEND));
-      // render(destinationPhotoContainer, createElement(getPhotos(pictures)), Position.BEFOREEND);
-      };
-      const onDestinationChange = (evt) =>{
-        const newDestination = evt.target.value;
-        this._api.getDestinations().then((destinations) => destinations
+    const fillDesinationPhotos = (pictures)=>{
+      while (destinationPhotoContainer.firstElementChild) {
+        destinationPhotoContainer.removeChild(destinationPhotoContainer.firstElementChild);
+      }
+      pictures.map((pict)=>render(destinationPhotoContainer, createElement(getPhotoTemplate(pict)), Position.BEFOREEND));
+    };
+    const onDestinationChange = (evt) =>{
+      const newDestination = evt.target.value;
+      this._api.getDestinations().then((destinations) => destinations
           .filter(({name})=> name === newDestination))
           .then(([dest])=>{
             currentDestination = dest;
@@ -114,16 +109,14 @@ export class PointController {
               fillDesinationPhotos(dest.pictures);
             }
           });
-      };
+    };
 
     this._tripEventEdit.getElement()
               .querySelector(`.event__input--destination`)
               .addEventListener(`change`, onDestinationChange);
-/////////////////////////new////////////////////////////////////////
 
     const getNewOffers = (evt) =>{
       const newPointType = evt.target.value;
-      // let newOffers = [];
       this._api.getOffers().then((offers) => offers
                      .filter(({type})=> type === newPointType))
                      .then(([offer])=> {
@@ -151,35 +144,31 @@ export class PointController {
 
       const newDestination = evt.target.value;
       this._api.getDestinations().then((destinations) => destinations
-                  .filter(({name})=> name === newDestination))
-                  .then(([dest])=>{
-                    currentDestination = dest;
-                    if (dest.description) {
-                      fillDesinationDescription(dest.description);
-                    }
-                    if (dest.pictures) {
-                      fillDesinationPhotos(dest.pictures);
-                    }
-                  });
+        .filter(({name})=> name === newDestination))
+        .then(([dest])=>{
+          currentDestination = dest;
+          if (dest.description) {
+            fillDesinationDescription(dest.description);
+          }
+          if (dest.pictures) {
+            fillDesinationPhotos(dest.pictures);
+          }
+        });
     };
 
     this._tripEventNew.getElement()
               .querySelector(`.event__input--destination`)
               .addEventListener(`change`, onNewPointDestinationChange);
-    // }
 
     const onEscKeyDown = (evt) => {
       if (evt.key === Key.ESCAPE || evt.key === Key.ESCAPE_IE) {
 
         if (mode === Mode.DEFAULT) {
           if (this._container.contains(this._tripEventEdit.getElement())) {
-            // this._container.getElement().replaceChild(this._taskView.getElement(), this._taskEdit.getElement());
             this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
           }
         } else if (mode === Mode.ADDING) {
           this._container.removeChild(currentView.getElement());
-          // Захотели создать карточку, но не стали ее сохранять
-          // this._onDataChange(null, null);
         }
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
@@ -209,7 +198,6 @@ export class PointController {
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
 
-    // const element = mode === Mode.ADDING ? this._tripEventNew : this._tripEventEdit;
     element.getElement()
      .querySelector(`.event__save-btn`)
      .addEventListener(`click`, (evt) => {
@@ -217,9 +205,6 @@ export class PointController {
 
        const formData = new FormData(element.getElement());
        const newPoint = Object.create(this._data);
-       // const newPoint = Object.create(new ModelPoint());
-
-       // newPoint.id = this._data.id;
        newPoint.type = formData.get(`event-type`);
        newPoint.destination = currentDestination;
        newPoint.isFavorite = formData.get(`event-favorite`) ? true : false;
@@ -230,21 +215,18 @@ export class PointController {
 
        this.block();
 
-       // this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
        const badData = this._findBadData(newPoint, element);
        if (badData === null) {
          evt.target.textContent = `Saving...`;
          if (mode === Mode.ADDING) {
            this._onDataChange(`create`, ModelPoint.toRAWNewPoint(newPoint), this.shake, this.unblock, this._deleteNewPoint);
          } else {
-           // evt.target.textContent = `Saving...`;
            this._onDataChange(`update`, newPoint, this.shake, this.unblock, this._deleteNewPoint);
          }
        } else {
          this.shake(badData);
          this.unblock();
        }
-       // this._deleteNewPoint();
 
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
@@ -302,15 +284,7 @@ export class PointController {
     });
     return offers;
   }
-  // _getEventType() {
-  //   const typeCheckbox = this._tripEventEdit.getElement().querySelector(`.event__type-toggle`);
-  //   const inputs = this._tripEventEdit.getElement().querySelectorAll(`.event__type-input`);
-  //   const eventTypeInput = Array.from(inputs).filter((input)=>input.checked);
-  //   const eventType = {};
-  //   eventType.name = eventTypeInput[0].value;
-  //   eventType.move = typeCheckbox.checked;
-  //   return eventType;
-  // }
+
   shake(element = this._tripEventEdit.getElement()) {
     const ANIMATION_TIMEOUT = 600;
     element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
@@ -343,6 +317,4 @@ export class PointController {
       this._container.replaceChild(this._tripEvent.getElement(), this._tripEventEdit.getElement());
     }
   }
-
-
 }

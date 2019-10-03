@@ -6,8 +6,18 @@ import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
 const PointControllerMode = Mode;
 const DEFAULT_POINT_TYPE = `flight`;
-const DEFAULT_SORTING = `sort-event`;
-const DEFAULT_FILTER = `filter-everything`;
+const Sorting = {
+  EVENT: `sort-event`,
+  PRICE: `sort-price`,
+  TIME: `sort-time`
+};
+const DEFAULT_SORTING = Sorting.EVENT;
+const Filter = {
+  EVERYTHING: `filter-everything`,
+  FUTURE: `filter-future`,
+  PAST: `filter-past`
+};
+const DEFAULT_FILTER = Filter.EVERYTHING;
 
 export class TripController {
   constructor(container, onDataChange) {
@@ -32,13 +42,11 @@ export class TripController {
       this._tripPoints = this._filterPoints(this._tripPoints, this._currentFilter);
     }
 
-    // this._container.innerHTML = ``;
-    // this._eventList.getElement().innerHTML = ``;
     unrender(this._sort);
     unrender(this._eventList);
     if (this._tripPoints.length === 0) {
       render(this._container, this._noPointsTemplate.getElement(), Position.BEFOREEND);
-    } else {//если есть хоть одна точка
+    } else {
       this._sort = new SortingList(this._currentSorting);
       render(this._container, this._sort.getElement(), Position.BEFOREEND);
       this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
@@ -56,7 +64,6 @@ export class TripController {
     this._onChangeView();
 
     const defaultPoint = {
-      // description: ``,
       startDate: new Date(),
       finishDate: new Date(),
       destination: {},
@@ -66,7 +73,6 @@ export class TripController {
     };
     defaultPoint.finishDate.setHours(defaultPoint.finishDate.getHours() + 1);
     this._creatingTripPoint = true;
-    // this._onDataChange(defaultPoint, null);
     let container = ``;
     if (this._tripPoints.length > 0) {
       container = this._container.querySelector(`.trip-events__trip-sort`);
@@ -90,14 +96,13 @@ export class TripController {
 
   _renderEvents() {
     switch (this._currentSorting) {
-      case `sort-event`:
-        // TripDayTemplate.count = null;
+      case Sorting.EVENT:
         this._renderDays();
         const containers = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByStartTime = this._tripPoints.slice().sort((a, b) => a.startDate - b.startDate);
         sortedByStartTime.forEach((tripPoint, ind) => this._renderTripPoint(containers[ind], tripPoint));
         break;
-      case `sort-time`:
+      case Sorting.TIME:
         render(this._eventList.getElement(), new TripDayTemplate(0, this._tripPoints.length).getElement(), Position.BEFOREEND);
         const containersByTime = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByTime = this._tripPoints.slice().map(function (point) {
@@ -106,7 +111,7 @@ export class TripController {
         }).sort((a, b) => b.duration - a.duration);
         sortedByTime.forEach((tripPoint, ind) => this._renderTripPoint(containersByTime[ind], tripPoint));
         break;
-      case `sort-price`:
+      case Sorting.PRICE:
         render(this._eventList.getElement(), new TripDayTemplate(0, this._tripPoints.length).getElement(), Position.BEFOREEND);
         const containersByPrice = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByPrice = this._tripPoints.slice().sort((a, b) => b.price - a.price);
@@ -128,14 +133,10 @@ export class TripController {
     if (this._creatingTripPoint) {
       unrender(this._creatingTripPoint._tripEventNew);
       this._creatingTripPoint = null;
-      // this.show(this._tripPoints);
     }
   }
 
   _onSortLinkClick(evt) {
-    // if (this._creatingTripPoint) {
-    //   return;
-    // }
     evt.preventDefault();
     if (evt.target.tagName !== `LABEL`) {
       return;
@@ -154,10 +155,10 @@ export class TripController {
     const currentDate = new Date();
     let filteredPoints = points;
     switch (currentFilter) {
-      case `filter-future`:
+      case Filter.FUTURE:
         filteredPoints = points.filter(({startDate})=> startDate > currentDate);
         break;
-      case `filter-past`:
+      case Filter.PAST:
         filteredPoints = points.filter(({finishDate})=> finishDate < currentDate);
         break;
     }

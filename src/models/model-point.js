@@ -8,7 +8,6 @@ export class ModelPoint {
     this.isFavorite = Boolean(data[`is_favorite`]);
     this.offers = data[`offers`] || [];
     this.type = data[`type`];
-    // this.isArchive = Boolean(data[`is_archive`]);
   }
 
   static parsePoint(data) {
