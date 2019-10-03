@@ -4,6 +4,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {getTotalCost, tripPointTypes, getDurationTime} from '../utils.js';
 const EURO = String.fromCharCode(8364);
 const DIAGRAM_COLOR = `white`;
+console.log(ChartDataLabels);
 
 export class Statistics extends AbstractComponent {
   getTemplate() {
@@ -78,6 +79,7 @@ export class Statistics extends AbstractComponent {
         }
       }
     });
+    console.log(moneyChart);
   }
 
   _buildTransportChart(points, unicTypes) {
@@ -131,6 +133,7 @@ export class Statistics extends AbstractComponent {
           }
         }
       });
+      cosole.log(transportChart);
     }
 
   }
@@ -180,5 +183,6 @@ export class Statistics extends AbstractComponent {
         }
       }
     });
-}
+    cosole.log(durationChart);
+  }
 }
