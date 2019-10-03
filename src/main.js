@@ -43,6 +43,9 @@ const tripMainElement = document.querySelector(`.trip-main`);
 const siteControlsElement = tripMainElement.querySelector(`.trip-main__trip-controls`);
 const renderSiteMenuTemplate = () => {
   const siteMenuTemplate = new SiteMenuTemplate(menu);
+  const tripTabs = siteMenuTemplate.getElement();
+  const tableLink = tripTabs.firstElementChild;
+  const statisticsLink = tripTabs.lastElementChild;
   siteMenuTemplate.getElement().addEventListener(`click`, (evt) => {
     evt.preventDefault();
 
@@ -51,15 +54,16 @@ const renderSiteMenuTemplate = () => {
     }
     // tripEventsElement.classList.toggle(`trip-events--hidden`);
     // statistics.getElement().classList.toggle(`visually-hidden`);
-
     switch (evt.target.textContent) {
       case `table`:
         tripEventsElement.classList.remove(`trip-events--hidden`);
         siteFilterTemplate.getElement().classList.remove(`trip-filters--hidden`);
-        const stat = statistics.getElement();
-        if (!stat.classList.contains(`visually-hidden`)) {
-          stat.classList.add(`visually-hidden`);
+        // const stat = statistics.getElement();
+        unrender(statistics);
+        if (!tableLink.classList.contains(`trip-tabs__btn--active`)) {
+          tableLink.classList.add(`trip-tabs__btn--active`);
         }
+        statisticsLink.classList.remove(`trip-tabs__btn--active`);
         break;
       case `stats`:
         if (!tripEventsElement.classList.contains(`trip-events--hidden`)) {
@@ -69,10 +73,14 @@ const renderSiteMenuTemplate = () => {
         if (!siteFilter.classList.contains(`trip-filters--hidden`)) {
           siteFilter.classList.add(`trip-filters--hidden`);
         }
-        unrender(statistics);
         render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
         statistics.getElement().classList.remove(`visually-hidden`);
         statistics.buildChart(tripPoints);
+
+        if (!statisticsLink.classList.contains(`trip-tabs__btn--active`)) {
+          statisticsLink.classList.add(`trip-tabs__btn--active`);
+        }
+        tableLink.classList.remove(`trip-tabs__btn--active`);
         break;
     }
   });

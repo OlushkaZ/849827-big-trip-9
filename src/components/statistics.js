@@ -1,7 +1,7 @@
 import {AbstractComponent} from './abstract-component.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {getTotalCost, tripPointTypes} from '../utils.js';
+import {getTotalCost, tripPointTypes, getDurationTime} from '../utils.js';
 const EURO = String.fromCharCode(8364);
 const DIAGRAM_COLOR = `white`;
 
@@ -29,16 +29,19 @@ export class Statistics extends AbstractComponent {
   }
 
   buildChart(points) {
-    const pointTypes = points.map(({type})=>type);
-    const unicTypes = pointTypes.filter((type, pos)=>pointTypes.indexOf(type) === pos);
-    this._buildMoneyChart(points, unicTypes, getTotalCost);
-    this._buildTransportChart(points, unicTypes);
+    if (points.length > 0) {
+      const pointTypes = points.map(({type})=>type);
+      const unicTypes = pointTypes.filter((type, pos)=>pointTypes.indexOf(type) === pos);
+      this._buildMoneyChart(points, unicTypes);
+      this._buildTransportChart(points, unicTypes);
+      this._buildDurationChart(points, unicTypes);
+    }
   }
 
   _buildMoneyChart(points, unicTypes) {
-    const sum = [];
+    const sums = [];
     unicTypes.forEach((pointType)=>{
-      sum.push(getTotalCost(points.filter(({type}) => type === pointType)));
+      sums.push(getTotalCost(points.filter(({type}) => type === pointType)));
     });
     const ctx = document.querySelector(`.statistics__chart--money`).getContext(`2d`);
     const moneyChart = new Chart(ctx, {
@@ -46,7 +49,7 @@ export class Statistics extends AbstractComponent {
       data: {
         labels: unicTypes,
         datasets: [{
-          data: sum,
+          data: sums,
           backgroundColor: DIAGRAM_COLOR,
         }]
       },
@@ -87,19 +90,68 @@ export class Statistics extends AbstractComponent {
         transports.push(pointType.name);
       }
     });
+    if (transports.length > 0) {
+      transports.forEach((transport)=>{
+        quantity.push(points.filter(({type})=>type === transport).length);
+      });
 
-    transports.forEach((transport)=>{
-      quantity.push(points.filter(({type})=>type === transport).length);
+
+      const ctx = document.querySelector(`.statistics__chart--transport`).getContext(`2d`);
+      const transportChart = new Chart(ctx, {
+        type: `horizontalBar`,
+        data: {
+          labels: transports,
+          datasets: [{
+            data: quantity,
+            backgroundColor: DIAGRAM_COLOR,
+          }]
+        },
+        options: {
+          plugins: {
+            datalabels: {
+              anchor: `end`,
+              align: `start`,
+              formatter: (value) =>{
+                return `${value}x`;
+              }
+            }},
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: `TRANSPORT`,
+            position: `left`},
+          scales: {
+            xAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }
+      });
+    }
+
+  }
+
+  _buildDurationChart(points, unicTypes) {
+    const durations = [];
+    const durationLabes = [];
+    unicTypes.forEach((pointType)=>{
+      const xxx = points.filter(({type}) => type === pointType).map((point)=>point.finishDate - point.startDate);
+      const eee = xxx.reduce((durationEventTotal, duration)=> durationEventTotal + duration, 0);
+      durations.push(eee);
+      durationLabes.push(getDurationTime(eee));
     });
 
-
-    const ctx = document.querySelector(`.statistics__chart--transport`).getContext(`2d`);
-    const transportChart = new Chart(ctx, {
+    const ctx = document.querySelector(`.statistics__chart--time`).getContext(`2d`);
+    const durationChart = new Chart(ctx, {
       type: `horizontalBar`,
       data: {
-        labels: transports,
+        labels: unicTypes,
         datasets: [{
-          data: quantity,
+          data: durations,
           backgroundColor: DIAGRAM_COLOR,
         }]
       },
@@ -108,8 +160,8 @@ export class Statistics extends AbstractComponent {
           datalabels: {
             anchor: `end`,
             align: `start`,
-            formatter: (value) =>{
-              return `${value}x`;
+            formatter: (value, context) =>{
+              return ` ${durationLabes[context.dataIndex]}`;
             }
           }},
         legend: {
@@ -117,7 +169,7 @@ export class Statistics extends AbstractComponent {
         },
         title: {
           display: true,
-          text: `TRANSPORT`,
+          text: `MONEY`,
           position: `left`},
         scales: {
           xAxes: [{
@@ -128,7 +180,5 @@ export class Statistics extends AbstractComponent {
         }
       }
     });
-
-  }
-
+}
 }
