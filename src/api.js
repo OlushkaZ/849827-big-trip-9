@@ -1,5 +1,6 @@
 import {ModelDestination} from './models/model-destination.js';
 import {ModelPoint} from './models/model-point.js';
+import {ModelOffer} from './models/model-offer.js';
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -38,15 +39,21 @@ export const API = class {
       .then(ModelDestination.parseDestinations);
   }
 
-  // createTask({task}) {
-  //   return this._load({
-  //     url: `tasks`,
-  //     method: Method.POST,
-  //     body: JSON.stringify(task),
-  //     headers: new Headers({'Content-Type': `application/json`})
-  //   })
-  //     .then(toJSON);
-  // }
+  getOffers() {
+    return this._load({url: `offers`})
+      .then(toJSON)
+      .then(ModelOffer.parseOffers);
+  }
+
+  createPoint({data}) {
+    return this._load({
+      url: `/points`,
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON);
+  }
 
   updatePoint({id, data}) {
     return this._load({
@@ -59,6 +66,7 @@ export const API = class {
   }
 
   deletePoint({id}) {
+
     return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
@@ -68,7 +76,6 @@ export const API = class {
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {
-        console.error(`fetch error: ${err}`);
         throw err;
       });
   }

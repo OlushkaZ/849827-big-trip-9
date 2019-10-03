@@ -1,8 +1,9 @@
 import {AbstractComponent} from './abstract-component.js';
 import moment from 'moment';
+import {tripPointTypes, getDurationTime} from '../utils.js';
 
 export class EventTemplate extends AbstractComponent {
-  constructor({type, destination, startDate, finishDate, price, offers}, tripPointTypes) {
+  constructor({type, destination, startDate, finishDate, price, offers}) {
     super();
     this._type = type;
     this._types = tripPointTypes;
@@ -18,21 +19,11 @@ export class EventTemplate extends AbstractComponent {
   }
 
   _isMove(currentType) {
-    const pointType = this._types.filter((type)=>type.name === currentType)[0];
-    return pointType.move ? ` to` : ` in`;
-  }
-
-  static getDurationTime(startDate, finishDate) {
-    const duration = finishDate - startDate;
-    const durationInMinutes = Math.floor((duration) / 1000 / 60);
-    const durationInHours = Math.floor((durationInMinutes) / 60);
-    const days = Math.floor((durationInHours) / 24);
-    const minutes = durationInMinutes % 60;
-    const hours = days ? durationInHours % 24 : durationInHours;
-    let result = (`00` + minutes).slice(-2) + `M`;
-    result = hours ? (`00` + hours).slice(-2) + `H ` + result : result;
-    result = days ? (`00` + days).slice(-2) + `D ` + result : result;
-    return result;
+    if (currentType) {
+      const pointType = this._types.filter((type)=>type.name === currentType)[0];
+      return pointType.move ? ` to` : ` in`;
+    }
+    return ``;
   }
 
   getTemplate() {
@@ -48,7 +39,7 @@ export class EventTemplate extends AbstractComponent {
            &mdash;
            <time class="event__end-time" datetime="${moment(this._finishDate).format()}">${EventTemplate.getTimeFromDate(this._finishDate)}</time>
          </p>
-         <p class="event__duration">${EventTemplate.getDurationTime(this._startDate, this._finishDate)}</p>
+         <p class="event__duration">${getDurationTime(this._finishDate - this._startDate)}</p>
        </div>
 
        <p class="event__price">
@@ -61,7 +52,7 @@ export class EventTemplate extends AbstractComponent {
              <span class="event__offer-title">${offer.title}</span>
              &plus;
              &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-            </li>` : ``).slice(0, 2).join(``)}
+            </li>` : ``).filter((offer)=>offer).slice(0, 3).join(``)}
 
        </ul>
 
