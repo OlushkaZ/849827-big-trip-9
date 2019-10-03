@@ -86,3 +86,7 @@ export const getDurationTime = (duration)=>{
   result = days ? (`00` + days).slice(-2) + `D ` + result : result;
   return result;
 };
+
+export const isInteger = (num)=>{
+  return (num ^ 0) === num;
+};

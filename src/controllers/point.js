@@ -5,7 +5,7 @@ import {EventEditTemplateDetails} from '../components/trip-event-edit-details.js
 import {EventEditTemplateDestination} from '../components/trip-event-edit-destination.js';
 import {EventNewTemplate} from '../components/trip-event-new.js';
 import {ModelPoint} from '../models/model-point.js';
-import {render, unrender, createElement, isEmpty, Position, Key, tripPointTypes} from '../utils.js';
+import {render, unrender, createElement, isEmpty, Position, Key, tripPointTypes, isInteger} from '../utils.js';
 import {api} from '../main.js';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
@@ -308,6 +308,9 @@ export class PointController {
     }
     if (newPoint.startDate > newPoint.finishDate) {
       return element.getElement().querySelector(`.event__field-group--time`);
+    }
+    if (!isInteger(newPoint.price)) {
+      return element.getElement().querySelector(`.event__field-group--price`);
     }
     return null;
   }
