@@ -231,20 +231,20 @@ export class PointController {
        this.block();
 
        // this._onDataChange(`update`, mode === Mode.DEFAULT ? newPoint : null);
-       if (mode === Mode.ADDING) {
-         const badData = this._findBadData(newPoint);
-         if (badData === null) {
-           evt.target.textContent = `Saving...`;
+       const badData = this._findBadData(newPoint, element);
+       if (badData === null) {
+         evt.target.textContent = `Saving...`;
+         if (mode === Mode.ADDING) {
            this._onDataChange(`create`, ModelPoint.toRAWNewPoint(newPoint), this.shake, this.unblock, this._deleteNewPoint);
          } else {
-           this.shake(badData);
-           this.unblock();
+           // evt.target.textContent = `Saving...`;
+           this._onDataChange(`update`, newPoint, this.shake, this.unblock, this._deleteNewPoint);
          }
-         // this._deleteNewPoint();
        } else {
-         evt.target.textContent = `Saving...`;
-         this._onDataChange(`update`, newPoint, this.shake, this.unblock, this._deleteNewPoint);
+         this.shake(badData);
+         this.unblock();
        }
+       // this._deleteNewPoint();
 
        document.removeEventListener(`keydown`, onEscKeyDown);
      });
@@ -328,12 +328,12 @@ export class PointController {
     this._tripEventEdit.getElement().querySelector(`.event__save-btn`).disabled = false;
     this._tripEventEdit.getElement().querySelector(`.event__reset-btn`).disabled = false;
   }
-  _findBadData(newPoint) {
+  _findBadData(newPoint, element) {
     if (isEmpty(newPoint.destination)) {
-      return this._tripEventNew.getElement().querySelector(`.event__field-group`);
+      return element.getElement().querySelector(`.event__field-group`);
     }
     if (newPoint.startDate > newPoint.finishDate) {
-      return this._tripEventNew.getElement().querySelector(`.event__field-group--time`);
+      return element.getElement().querySelector(`.event__field-group--time`);
     }
     return null;
   }
