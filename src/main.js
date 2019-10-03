@@ -69,8 +69,10 @@ const renderSiteMenuTemplate = () => {
         if (!siteFilter.classList.contains(`trip-filters--hidden`)) {
           siteFilter.classList.add(`trip-filters--hidden`);
         }
+        unrender(statistics);
+        render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
         statistics.getElement().classList.remove(`visually-hidden`);
-        statistics.buildChart(tripPoints, getTotalCost);
+        statistics.buildChart(tripPoints);
         break;
     }
   });
@@ -120,7 +122,7 @@ api.getPoints().then((points) => {
   tripPoints = points;
 }).then(renderRouteTemplate).then(renderTotalCost);
 
-render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
+// render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
 
 
 const refreshPoints = (points)=>{
