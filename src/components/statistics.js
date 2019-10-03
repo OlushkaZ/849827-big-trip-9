@@ -169,7 +169,7 @@ export class Statistics extends AbstractComponent {
         },
         title: {
           display: true,
-          text: `MONEY`,
+          text: `TIME`,
           position: `left`},
         scales: {
           xAxes: [{

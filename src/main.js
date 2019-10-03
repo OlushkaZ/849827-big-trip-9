@@ -1,6 +1,3 @@
-// const EVENTS_COUNT = 4;
-let tripPoints = [];
-let tripController = {};
 import {SiteMenuTemplate} from './components/site-menu.js';
 import {SiteFilterTemplate} from './components/site-filter.js';
 import {RouteTemplate} from './components/current-route.js';
@@ -8,23 +5,14 @@ import {RouteLoadingTemplate} from './components/current-route-loading.js';
 import {TripController} from './controllers/trip.js';
 import {Statistics} from './components/statistics.js';
 import {API} from './api.js';
-
-import {filter, menu} from './data.js';
-import {render, unrender, Position, getTotalCost} from './utils.js';
+import {render, unrender, Position, getTotalCost, filter, menu} from './utils.js';
 
 const AUTHORIZATION = `Basic ao0w590ik29889aaa=${Math.random()}`;
 const END_POINT = `https://htmlacademy-es-9.appspot.com/big-trip`;
+let tripPoints = [];
+let tripController = {};
 
 export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-const zzz = api.getPoints().then((points) => console.log(points));
-const rrr = api.getDestinations().then((destinations) => console.log(destinations));
-// const uuu = api.getDestinations();
-// console.log(uuu);
-// const onDataChange = () => {};
-
-// const boardController = new BoardController(taskListElement, onDataChange);
-
-// api.getTasks().then((tasks) => boardController.show(tasks));
 
 const getRoute = ()=>{
   const cities = tripPoints.map(({destination}) => destination.name);
@@ -52,20 +40,18 @@ const renderSiteMenuTemplate = () => {
     if (evt.target.tagName !== `A`) {
       return;
     }
-    // tripEventsElement.classList.toggle(`trip-events--hidden`);
-    // statistics.getElement().classList.toggle(`visually-hidden`);
+
     switch (evt.target.textContent) {
-      case `table`:
+      case menu[0].title:
         tripEventsElement.classList.remove(`trip-events--hidden`);
         siteFilterTemplate.getElement().classList.remove(`trip-filters--hidden`);
-        // const stat = statistics.getElement();
         unrender(statistics);
         if (!tableLink.classList.contains(`trip-tabs__btn--active`)) {
           tableLink.classList.add(`trip-tabs__btn--active`);
         }
         statisticsLink.classList.remove(`trip-tabs__btn--active`);
         break;
-      case `stats`:
+      case menu[1].title:
         if (!tripEventsElement.classList.contains(`trip-events--hidden`)) {
           tripEventsElement.classList.add(`trip-events--hidden`);
         }
@@ -100,11 +86,6 @@ newEventButton.addEventListener(`click`, (evt) => {
   tripController.createTripPoint();
 });
 
-// const pointMocks = new Array(EVENTS_COUNT)
-// .fill(``)
-// .map(getTripPoint);
-// tripPoints.push(...pointMocks);
-
 const siteRouteElement = tripMainElement.querySelector(`.trip-main__trip-info`);
 let routeLoadingTemplate;
 const renderRouteLoadingTemplate = () => {
@@ -130,9 +111,6 @@ api.getPoints().then((points) => {
   tripPoints = points;
 }).then(renderRouteTemplate).then(renderTotalCost);
 
-// render(tripEventsElement, statistics.getElement(), Position.AFTEREND);
-
-
 const refreshPoints = (points)=>{
   tripPoints = points;
   renderTotalCost();
@@ -140,7 +118,6 @@ const refreshPoints = (points)=>{
 };
 
 const onDataChange = (actionType, update, shake, unblock, deleteNewPoint) => {
-  // eventTemplate.block();
   switch (actionType) {
     case `update`:
       api.updatePoint({
@@ -208,6 +185,5 @@ const onFilterLinkClick = (evt)=> {
   }
   tripController.setFilter(evt.target.htmlFor);
   tripController.show(tripPoints);
-  // this._renderEvents();
   document.getElementById(evt.target.htmlFor).checked = true;
 };

@@ -10,6 +10,30 @@ export const Key = {
   ESCAPE_IE: `Escape`
 };
 
+export const filter = [
+  {title: `everything`, checked: true},
+  {title: `future`, checked: false},
+  {title: `past`, count: false}
+];
+
+export const menu = [
+  {title: `table`, active: true},
+  {title: `stats`, active: false}
+];
+
+export const tripPointTypes = [
+  {name: `bus`, move: true},
+  {name: `flight`, move: true},
+  {name: `drive`, move: true},
+  {name: `ship`, move: true},
+  {name: `taxi`, move: true},
+  {name: `train`, move: true},
+  {name: `transport`, move: true},
+  {name: `check-in`, move: false},
+  {name: `restaurant`, move: false},
+  {name: `sightseeing`, move: false}
+];
+
 export const createElement = (template)=>{
   const newElement = document.createElement(`div`);
   newElement.innerHTML = template;
@@ -51,18 +75,6 @@ export const getTotalCost = (points)=>points
          .filter(({accepted})=>accepted)
          .reduce((pointSum, {price})=> pointSum + price, 0), 0);
 
-export const tripPointTypes = [
-  {name: `bus`, move: true},
-  {name: `flight`, move: true},
-  {name: `drive`, move: true},
-  {name: `ship`, move: true},
-  {name: `taxi`, move: true},
-  {name: `train`, move: true},
-  {name: `transport`, move: true},
-  {name: `check-in`, move: false},
-  {name: `restaurant`, move: false},
-  {name: `sightseeing`, move: false}
-];
 export const getDurationTime = (duration)=>{
   // const duration = finishDate - startDate;
   const durationInMinutes = Math.floor((duration) / 1000 / 60);
