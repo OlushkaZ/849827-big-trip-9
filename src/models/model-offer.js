@@ -1,15 +1,15 @@
 export class ModelOffer {
-  constructor(data) {
-    this.offers = data[`offers`] || [];
-    this.type = data[`type`];
+  constructor(offer) {
+    this.offers = offer[`offers`] || [];
+    this.type = offer[`type`];
   }
 
-  static parseOffer(data) {
-    return new ModelOffer(data);
+  static parseOffer(offer) {
+    return new ModelOffer(offer);
   }
 
-  static parseOffers(data) {
-    return data.map(ModelOffer.parseOffer);
+  static parseOffers(offers) {
+    return offers.map(ModelOffer.parseOffer);
   }
 
   toRAW() {

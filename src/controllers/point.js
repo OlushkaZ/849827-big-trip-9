@@ -18,18 +18,18 @@ export const Mode = {
 };
 
 export class PointController {
-  constructor(container, data, mode, onDataChange, onChangeView, deleteNewPoint) {
+  constructor(container, point, mode, onDataChange, onChangeView, deleteNewPoint) {
     this._container = container;
-    this._data = data;
+    this._data = point;
     this._onChangeView = onChangeView;
     this._onDataChange = onDataChange;
     this._deleteNewPoint = deleteNewPoint;
-    this._tripEvent = new EventTemplate(data);
-    this._tripEventEdit = new EventEditTemplate(data);
-    this._tripEventEditDetails = new EventEditTemplateDetails(data);
-    this._tripEventEditOffers = new EventEditTemplateOffers(data.offers);
-    this._tripEventEditDestination = new EventEditTemplateDestination(data);
-    this._tripEventNew = new EventNewTemplate(data);
+    this._tripEvent = new EventTemplate(point);
+    this._tripEventEdit = new EventEditTemplate(point);
+    this._tripEventEditDetails = new EventEditTemplateDetails(point);
+    this._tripEventEditOffers = new EventEditTemplateOffers(point.offers);
+    this._tripEventEditDestination = new EventEditTemplateDestination(point);
+    this._tripEventNew = new EventNewTemplate(point);
     this._api = api;
     this.shake = this.shake.bind(this);
     this.unblock = this.unblock.bind(this);

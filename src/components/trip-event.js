@@ -18,11 +18,6 @@ export class EventTemplate extends AbstractComponent {
     return moment(date).format(` HH:mm`);
   }
 
-  // _isMove(currentType) {
-  //   const pointType = this._types.filter((type)=>type.name === currentType)[0];
-  //   return pointType.move ? ` to` : ` in`;
-  // }
-
   _isMove(currentType) {
     if (currentType) {
       const pointType = this._types.filter((type)=>type.name === currentType)[0];
@@ -30,19 +25,6 @@ export class EventTemplate extends AbstractComponent {
     }
     return ``;
   }
-
-  // static getDurationTime(duration) {
-  //   // const duration = finishDate - startDate;
-  //   const durationInMinutes = Math.floor((duration) / 1000 / 60);
-  //   const durationInHours = Math.floor((durationInMinutes) / 60);
-  //   const days = Math.floor((durationInHours) / 24);
-  //   const minutes = durationInMinutes % 60;
-  //   const hours = days ? durationInHours % 24 : durationInHours;
-  //   let result = (`00` + minutes).slice(-2) + `M`;
-  //   result = hours ? (`00` + hours).slice(-2) + `H ` + result : result;
-  //   result = days ? (`00` + days).slice(-2) + `D ` + result : result;
-  //   return result;
-  // }
 
   getTemplate() {
     return `<div class="event">

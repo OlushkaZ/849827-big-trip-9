@@ -76,7 +76,6 @@ export const getTotalCost = (points)=>points
          .reduce((pointSum, {price})=> pointSum + price, 0), 0);
 
 export const getDurationTime = (duration)=>{
-  // const duration = finishDate - startDate;
   const durationInMinutes = Math.floor((duration) / 1000 / 60);
   const durationInHours = Math.floor((durationInMinutes) / 60);
   const days = Math.floor((durationInHours) / 24);

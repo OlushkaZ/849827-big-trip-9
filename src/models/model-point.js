@@ -1,21 +1,21 @@
 export class ModelPoint {
-  constructor(data) {
-    this.id = data[`id`];
-    this.price = data[`base_price`];
-    this.startDate = new Date(data[`date_from`]);
-    this.finishDate = new Date(data[`date_to`]);
-    this.destination = data[`destination`] || {};
-    this.isFavorite = Boolean(data[`is_favorite`]);
-    this.offers = data[`offers`] || [];
-    this.type = data[`type`];
+  constructor(point) {
+    this.id = point[`id`];
+    this.price = point[`base_price`];
+    this.startDate = new Date(point[`date_from`]);
+    this.finishDate = new Date(point[`date_to`]);
+    this.destination = point[`destination`] || {};
+    this.isFavorite = Boolean(point[`is_favorite`]);
+    this.offers = point[`offers`] || [];
+    this.type = point[`type`];
   }
 
-  static parsePoint(data) {
-    return new ModelPoint(data);
+  static parsePoint(point) {
+    return new ModelPoint(point);
   }
 
-  static parsePoints(data) {
-    return data.map(ModelPoint.parsePoint);
+  static parsePoints(points) {
+    return points.map(ModelPoint.parsePoint);
   }
 
   toRAW() {

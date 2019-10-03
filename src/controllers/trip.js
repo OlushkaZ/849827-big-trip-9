@@ -6,12 +6,12 @@ import {PointController, Mode} from './point.js';
 import {render, unrender, Position} from '../utils.js';
 const PointControllerMode = Mode;
 const DEFAULT_POINT_TYPE = `flight`;
-const Sorting = {
+const Sort = {
   EVENT: `sort-event`,
   PRICE: `sort-price`,
   TIME: `sort-time`
 };
-const DEFAULT_SORTING = Sorting.EVENT;
+const DEFAULT_SORT = Sort.EVENT;
 const Filter = {
   EVERYTHING: `filter-everything`,
   FUTURE: `filter-future`,
@@ -23,7 +23,7 @@ export class TripController {
   constructor(container, onDataChange) {
     this._container = container;
     this._tripPoints = [];
-    this._currentSorting = DEFAULT_SORTING;
+    this._currentSorting = DEFAULT_SORT;
     this._currentFilter = DEFAULT_FILTER;
     this._sort = new SortingList(this._currentSorting);
     this._eventList = new EventListTemplate();
@@ -96,13 +96,13 @@ export class TripController {
 
   _renderEvents() {
     switch (this._currentSorting) {
-      case Sorting.EVENT:
+      case Sort.EVENT:
         this._renderDays();
         const containers = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByStartTime = this._tripPoints.slice().sort((a, b) => a.startDate - b.startDate);
         sortedByStartTime.forEach((tripPoint, ind) => this._renderTripPoint(containers[ind], tripPoint));
         break;
-      case Sorting.TIME:
+      case Sort.TIME:
         render(this._eventList.getElement(), new TripDayTemplate(0, this._tripPoints.length).getElement(), Position.BEFOREEND);
         const containersByTime = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByTime = this._tripPoints.slice().map(function (point) {
@@ -111,7 +111,7 @@ export class TripController {
         }).sort((a, b) => b.duration - a.duration);
         sortedByTime.forEach((tripPoint, ind) => this._renderTripPoint(containersByTime[ind], tripPoint));
         break;
-      case Sorting.PRICE:
+      case Sort.PRICE:
         render(this._eventList.getElement(), new TripDayTemplate(0, this._tripPoints.length).getElement(), Position.BEFOREEND);
         const containersByPrice = this._eventList.getElement().querySelectorAll(`.trip-events__item`);
         const sortedByPrice = this._tripPoints.slice().sort((a, b) => b.price - a.price);
